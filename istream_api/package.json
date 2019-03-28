@@ -1,0 +1,28 @@
+{
+   "name": "istream_api",
+   "version": "0.0.1",
+   "description": "iStream API",
+   "devDependencies": {
+      "ts-node": "3.3.0",
+      "@types/node": "^8.0.29",
+      "typescript": "2.5.2"
+   },
+   "dependencies": {
+      "allocine-api": "^0.1.9",
+      "axios": "^0.18.0",
+      "bluebird": "^3.5.3",
+      "cors": "^2.8.4",
+      "exiftool": "0.0.3",
+      "express": "^4.16.4",
+      "reflect-metadata": "^0.1.10",
+      "request-x-ray": "^0.1.4",
+      "sqlite3": "^3.1.10",
+      "typeorm": "^0.3.0-alpha.22",
+      "x-ray": "^2.3.3"
+   },
+   "scripts": {
+      "start": "ts-node src/index.ts",
+      "generate": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:generate",
+      "sync": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:sync"
+   }
+}
