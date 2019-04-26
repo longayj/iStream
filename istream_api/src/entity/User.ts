@@ -40,6 +40,21 @@ export class User {
     language:string = 'en';
 
     @Column()
+    darkMode: boolean = false;
+
+    @Column()
+    primaryColor: string = "#338ABD";
+
+    @Column()
+    secondaryColor: string = "#F1580A";
+
+    @Column()
+    preferredStreamLanguage: string = "French";
+
+    @Column()
+    preferredStreamQuality: string = "p360"
+
+    @Column()
     allDebridUsername: string = '';
 
     @Column()
