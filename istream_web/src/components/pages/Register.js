@@ -24,6 +24,17 @@ import Texts from "../../constants/Texts";
 import Languages from "../../constants/Languages";
 
 import Validator from "../../utils/Validator";
+import Status from "../../constants/Status";
+import CommunicationApi from "../../utils/CommunicationApi";
+import Fields from "../../constants/Fields";
+import Paths from "../../constants/Paths";
+import HttpMethods from "../../constants/HttpMethods";
+
+import {
+    globalDisplayAlertDialog,
+    globalDisplayLoadMask,
+    globalDismissLoadMask
+} from "../../redux/actions/globalActions";
 
 const styles = theme => ({
     paper: {
@@ -62,19 +73,20 @@ class Register extends React.Component {
             open: true,
 
             username: "",
-            usernameError: true,
+            usernameError: false,
 
             email: "",
-            emailError: true,
+            emailError: false,
 
             password: "",
-            passwordError: true,
+            passwordError: false,
 
             confirmPassword: "",
-            confirmPasswordError: true,
+            confirmPasswordError: false,
 
-            language: Languages.English,
-            languageError: true,
+            language: (props.location.state === undefined ?
+                Languages.English : props.location.state.languageString),
+            languageError: false,
 
             debridUsername: "",
             debridPassword: "",
@@ -152,8 +164,70 @@ class Register extends React.Component {
         });
     }
 
+    register() {
+        let params = {};
+
+        let me = this;
+
+        params[Fields.USERNAME] = this.state.login;
+        params[Fields.EMAIL] = this.state.email;
+        params[Fields.PASSWORD] = this.state.password;
+        params[Fields.LANGUAGE] = this.state.language;
+
+        this.props.globalDisplayLoadMask();
+        let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.REGISTER, params);
+        communication.sendRequest(
+            function (response) {
+
+                me.props.globalDismissLoadMask();
+
+                if (response.status === 200) {
+
+                    me.props.history.push('/auth', {
+                        languageString: me.state.languageString
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            function (error) {
+
+                me.props.globalDismissLoadMask();
+
+                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                        text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[error.response.status][me.props.profile.languageString]
+                    });
+
+                }
+            }
+        );
+    }
+
     handleRegisterClick() {
         console.log(this.state);
+
+        if (!this.state.loginError &&
+            !this.state.passwordError &&
+            !this.state.emailError) {
+
+            this.register();
+        }
     }
 
     render() {
@@ -358,6 +432,8 @@ function mapStateToProps(state) {
 }
 
 export default withRouter(connect(mapStateToProps, {
-
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalDisplayAlertDialog
 
 })(withStyles(styles, { withTheme: true })(Register)));

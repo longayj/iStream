@@ -84,8 +84,8 @@ const initialState = {
     addVideoModalCurrentVideoPoster: "",
 
     profile: {
-        auth: true,
-        isAdmin: false,
+        auth: false,
+        isAdmin: true,
         username: "Macubix",
         email: "macubix@gmail.com",
         pictureUrl: "",

@@ -38,6 +38,11 @@ import { SketchPicker } from 'react-color';
 import Languages from "../../constants/Languages";
 import VideoQualities from "../../constants/VideoQualities";
 import Texts from "../../constants/Texts"
+import Fields from "../../constants/Fields";
+import CommunicationApi from "../../utils/CommunicationApi";
+import HttpMethods from "../../constants/HttpMethods";
+import Paths from "../../constants/Paths";
+import Status from "../../constants/Status";
 
 const styles = theme => ({
     root: {
@@ -97,9 +102,60 @@ class Settings extends React.Component {
         this.props.globalResetSettingsChanges();
     }
 
+    applySettings() {
+        let params = {};
+
+        let me = this;
+
+        params[Fields.USERNAME] = this.state.login;
+        params[Fields.PASSWORD] = this.state.password;
+
+        this.props.globalDisplayLoadMask();
+        let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.LOGIN, params);
+        communication.sendRequest(
+            function (response) {
+
+                me.props.globalDismissLoadMask();
+
+                if (response.status === 200) {
+
+
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            function (error) {
+
+                me.props.globalDismissLoadMask();
+
+                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                        text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[error.response.status][me.props.profile.languageString]
+                    });
+
+                }
+            }
+        );
+    }
+
     handleApplyClick() {
         if (this.props.settingsProfile.preferredStreamLanguage !== this.props.profile.preferredStreamLanguage ||
-        this.props.settingsProfile.preferredStreamQuality !== this.props.profile.preferredStreamQuality) {
+            this.props.settingsProfile.preferredStreamQuality !== this.props.profile.preferredStreamQuality) {
 
             this.props.homeSetVideosStreamPreferences({
                 language: this.props.settingsProfile.preferredStreamLanguage,

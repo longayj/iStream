@@ -1,4 +1,8 @@
 const Fields = {
+    USERNAME: "username",
+    PASSWORD: "password",
+    EMAIL: "email",
+    LANGUAGE: "language",
     TITLE: "title",
     URL: "url",
     Q: "q",

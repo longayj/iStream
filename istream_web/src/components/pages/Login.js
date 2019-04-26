@@ -19,6 +19,20 @@ import Texts from "../../constants/Texts";
 import Languages from "../../constants/Languages";
 
 import Validator from "../../utils/Validator";
+import CommunicationApi from "../../utils/CommunicationApi";
+import HttpMethods from "../../constants/HttpMethods";
+import Paths from "../../constants/Paths";
+import Status from "../../constants/Status";
+import Fields from "../../constants/Fields";
+
+import {
+    globalAuthSuccess,
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalDisplayAlertDialog
+} from "../../redux/actions/globalActions";
+
+import VideoQualities from "../../constants/VideoQualities";
 
 const styles = theme => ({
     paper: {
@@ -46,9 +60,9 @@ class Login extends React.Component {
             open: true,
 
             login: "",
-            loginError: true,
+            loginError: false,
             password: "",
-            passwordError: true,
+            passwordError: false,
             languageString: (props.location.state === undefined ?
                 Languages.English : props.location.state.languageString)
         }
@@ -89,8 +103,75 @@ class Login extends React.Component {
         });
     }
 
+    login() {
+        let params = {};
+
+        let me = this;
+
+        params[Fields.USERNAME] = this.state.login;
+        params[Fields.PASSWORD] = this.state.password;
+
+        this.props.globalDisplayLoadMask();
+        let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.LOGIN, params);
+        communication.sendRequest(
+            function (response) {
+
+                me.props.globalDismissLoadMask();
+
+                if (response.status === 200) {
+
+                    localStorage.setItem('token', response.data);
+
+                    me.props.globalAuthSuccess({
+                        isAdmin: true,
+                        username: "Macubix",
+                        email: "macubix@gmail.com",
+                        pictureUrl: "",
+                        darkMode: false,
+                        primaryColor: "#338ABD",
+                        secondaryColor: "#F1580A",
+                        languageString: Languages.French,
+                        preferredStreamLanguage: Languages.French,
+                        preferredStreamQuality: VideoQualities.p360
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            function (error) {
+
+                me.props.globalDismissLoadMask();
+
+                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                        text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[error.response.status][me.props.profile.languageString]
+                    });
+
+                }
+            }
+        );
+    }
+
     handleSignInClick() {
         console.log(this.state);
+        if (!this.state.loginError && !this.state.passwordError) {
+            this.login();
+        }
     }
 
     render() {
@@ -165,7 +246,12 @@ class Login extends React.Component {
                                 error={this.state.passwordError}
                             />
 
-                            <Link to={"/passwordLost"} replace style={{ textDecoration: 'none' }}>
+                            <Link to={{
+                                pathname: "/passwordLost",
+                                state: {
+                                    languageString: this.state.languageString
+                                }
+                            }}  replace style={{ textDecoration: 'none' }}>
                                 <Typography>
                                     {Texts.FORGOT_PASSWORD[this.state.languageString] + " ?"}
                                 </Typography>
@@ -197,6 +283,8 @@ function mapStateToProps(state) {
 }
 
 export default withRouter(connect(mapStateToProps, {
-
-
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalAuthSuccess,
+    globalDisplayAlertDialog
 })(withStyles(styles, { withTheme: true })(Login)));

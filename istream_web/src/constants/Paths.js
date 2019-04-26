@@ -11,7 +11,11 @@ const Paths = {
 
     STREAMS: "/streams",
 
-    SEARCH: "/search"
+    SEARCH: "/search",
+
+    LOGIN: "/login",
+
+    REGISTER: "/register"
 
 };
 
