@@ -10,4 +10,5 @@ services:
     ports:
       - '3001:3001'
     volumes:
+      - /home/app/appDir/
       - /home/app/appDir/node_modules

@@ -4,6 +4,9 @@ import {Video, Statistics, CastingShort, Streaming} from '../entity'
 import { createConnection } from 'typeorm';
 import { AlloCineApi, AllDebridApi } from '../Utils';
 import Axios from '../../node_modules/axios';
+import { checkJwt } from "../middlewares/checkJwt";
+import { checkRole } from "../middlewares/checkRole";
+
 
 const router: Router = Router();
 
@@ -363,7 +366,7 @@ router.get('/:id', (req: Request, res: Response) => {
  * @param id the movie id
  * DELETE /videos/:id
  */
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', [checkJwt, checkRole(["ADMIN"])], (req: Request, res: Response) => {
     let id = req.params.id;
     connection.getRepository(Video).findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort"]}).then(video => {
         if (video == undefined || video == null) {
