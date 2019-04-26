@@ -4,6 +4,8 @@ import { Streaming } from '../entity';
 import { createConnection } from '../../node_modules/typeorm';
 import { URL } from 'url';
 import { checkJwt } from '../middlewares/checkJwt';
+import { checkRole } from '../middlewares/checkRole';
+
 const https = require('https');
 const fs = require('fs');
 
