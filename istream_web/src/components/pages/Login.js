@@ -169,9 +169,9 @@ class Login extends React.Component {
 
     handleSignInClick() {
         console.log(this.state);
-        if (!this.state.loginError && !this.state.passwordError) {
+        //if (!this.state.loginError && !this.state.passwordError) {
             this.login();
-        }
+        //}
     }
 
     render() {
