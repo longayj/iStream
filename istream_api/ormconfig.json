@@ -5,17 +5,17 @@
    "migrationsRun": false,
    "logging": false,
    "entities": [
-      "src/entity/**/*.ts"
+      "/home/app/appDir/build/entity/**/*.js"
    ],
    "migrations": [
-      "src/migration/**/*.ts"
+      "/home/app/appDir/build/migration/**/*.js"
    ],
    "subscribers": [
-      "src/subscriber/**/*.ts"
+      "/home/app/appDir/build/subscriber/**/*.js"
    ],
    "cli": {
-      "entitiesDir": "src/entity",
-      "migrationsDir": "src/migration",
-      "subscribersDir": "src/subscriber"
+      "entitiesDir": "/home/app/appDir/build/entity",
+      "migrationsDir": "/home/app/appDir/build/migration",
+      "subscribersDir": "/home/app/appDir/build/subscriber"
    }
 }

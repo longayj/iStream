@@ -18,11 +18,14 @@
       "request-x-ray": "^0.1.4",
       "sqlite3": "^3.1.10",
       "typeorm": "^0.3.0-alpha.22",
-      "x-ray": "^2.3.3"
+      "x-ray": "^2.3.3",
+      "jsonwebtoken": "^8.5.1",
+      "bcryptjs": "^2.4.3"
    },
    "scripts": {
       "start": "ts-node src/index.ts",
       "generate": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:generate",
-      "sync": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:sync"
+      "sync": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:sync",
+      "build": "npm install; gulp copy; gulp watch & tsc-watch -p . --onSuccess \"node build/index.js\""
    }
 }

@@ -1,10 +1,12 @@
 import "reflect-metadata";
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique} from "typeorm";
 import { Like } from "./Like";
 import { Comment } from "./Comment";
 import { Video } from "./Video";
+import * as bcrypt from "bcryptjs";
 
 @Entity()
+@Unique(["username"])
 export class User {
 
     @PrimaryGeneratedColumn()
@@ -29,6 +31,9 @@ export class User {
     email: string = '';
 
     @Column()
+    role: string = '';
+
+    @Column()
     username:string = '';
 
     @Column()
@@ -48,7 +53,20 @@ export class User {
 
     @OneToMany(type => Video, video => video.user)
     videos: Video[];
-
+    
+    @Column({nullable: true})
+    isVerify: boolean = false;
+    
     @Column()
-	isDisable: boolean = false;
+    isDisable: boolean = false;
+    
+    hashPassword() {
+        this.password = bcrypt.hashSync(this.password, 8);
+    }
+    
+    checkIfUnencryptedPasswordIsValid(unencryptedPassword: string) {
+        if (unencryptedPassword == undefined)
+            return false
+        return bcrypt.compareSync(unencryptedPassword, this.password);
+    }
 }
