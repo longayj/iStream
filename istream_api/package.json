@@ -10,17 +10,18 @@
    "dependencies": {
       "allocine-api": "^0.1.9",
       "axios": "^0.18.0",
+      "bcryptjs": "^2.4.3",
       "bluebird": "^3.5.3",
       "cors": "^2.8.4",
       "exiftool": "0.0.3",
       "express": "^4.16.4",
+      "jsonwebtoken": "^8.5.1",
       "reflect-metadata": "^0.1.10",
       "request-x-ray": "^0.1.4",
       "sqlite3": "^3.1.10",
+      "tsc-watch": "^2.1.2",
       "typeorm": "^0.3.0-alpha.22",
-      "x-ray": "^2.3.3",
-      "jsonwebtoken": "^8.5.1",
-      "bcryptjs": "^2.4.3"
+      "x-ray": "^2.3.3"
    },
    "scripts": {
       "start": "ts-node src/index.ts",
