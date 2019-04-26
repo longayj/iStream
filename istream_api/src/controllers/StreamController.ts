@@ -3,6 +3,9 @@ import Axios from '../../node_modules/axios';
 import { Streaming } from '../entity';
 import { createConnection } from '../../node_modules/typeorm';
 import { URL } from 'url';
+import { checkJwt } from '../middlewares/checkJwt';
+import { checkRole } from '../middlewares/checkRole';
+
 const https = require('https');
 const fs = require('fs');
 
@@ -14,7 +17,7 @@ createConnection().then(async connection => {
  * get /streams/id
  * @params (opt) resolution (ex: fr360p, fr1080p) (if link exist)
  */
-router.get('/:id', (req: Request, res: Response) => {
+router.get('/:id', [checkJwt], (req: Request, res: Response) => {
     let id = req.params.id
     let resolution = "fr360p";
     let myurl = "";
@@ -101,7 +104,7 @@ router.post('/', (req: Request, res: Response) => {
 /**
  * permet de supprimer un stream avec fichier correspondant
  */
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', [checkJwt, checkRole(["ADMIN"])], (req: Request, res: Response) => {
 
 });
 

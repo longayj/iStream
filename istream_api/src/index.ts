@@ -7,7 +7,7 @@ import * as path from 'path'
 import * as bodyParser from 'body-parser';
 var cors = require('cors');
 
-import { VideoController, AllocineController, StreamController, ZoneTelechargementController } from './controllers';
+import { VideoController, AllocineController, StreamController, ZoneTelechargementController, AuthController } from './controllers';
 import { AllDebridApi } from "./Utils";
 
 var port = 3001;
@@ -18,14 +18,16 @@ createConnection()
     console.log("Inserting a new user into the database...");
     const user = new User();
     user.id = 1;
-    user.username = "DevTest";
+    user.username = "john";
     user.email = "test@test.com";
     user.firstName = "John";
     user.lastName = "Doe";
     user.allDebridUsername = "";
     user.allDebridPassword = "";
+    user.role = "ADMIN"
     user.age = 25;
-    user.password = "test";
+    user.password = "password";
+    user.hashPassword()
     await connection.manager.save(user);
     
     console.log("Saved a new user with id: " + user.id);
@@ -71,6 +73,7 @@ createConnection()
     app.use('/search', AllocineController);
     app.use('/streams', StreamController);
     app.use('/zone', ZoneTelechargementController)
+    app.use('/auth', AuthController)
 
     app.get('/', function(req:any, res:express.Response){
         res.send('Welcome To iStream Api');
