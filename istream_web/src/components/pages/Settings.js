@@ -12,7 +12,11 @@ import {
     globalSettingsSetPrincipalColor,
     globalSettingsSetSecondaryColor,
     globalResetSettingsChanges,
-    globalApplySettingsChanges
+    globalApplySettingsChanges,
+
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalDisplayAlertDialog,
 } from "../../redux/actions/globalActions";
 
 import {
@@ -107,11 +111,15 @@ class Settings extends React.Component {
 
         let me = this;
 
-        params[Fields.USERNAME] = this.state.login;
-        params[Fields.PASSWORD] = this.state.password;
+        params[Fields.USERNAME] = this.props.settingsProfile.username;
+        params[Fields.EMAIL] = this.props.settingsProfile.email;
+        params[Fields.LANGUAGE] = this.props.settingsProfile.languageString;
+        params[Fields.DARK_MODE] = this.props.settingsProfile.darkMode;
+        params[Fields.PRIMARY_COLOR] = this.props.settingsProfile.primaryColor;
+        params[Fields.SECONDARY_COLOR] = this.props.settingsProfile.secondaryColor;
 
         this.props.globalDisplayLoadMask();
-        let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.LOGIN, params);
+        let communication = new CommunicationApi(HttpMethods.PUT, Paths.HOST + Paths.USER + "/" + this.props.profile.id, params);
         communication.sendRequest(
             function (response) {
 
@@ -119,7 +127,16 @@ class Settings extends React.Component {
 
                 if (response.status === 200) {
 
+                    if (me.props.settingsProfile.preferredStreamLanguage !== me.props.profile.preferredStreamLanguage ||
+                        me.props.settingsProfile.preferredStreamQuality !== me.props.profile.preferredStreamQuality) {
 
+                        me.props.homeSetVideosStreamPreferences({
+                            language: me.props.settingsProfile.preferredStreamLanguage,
+                            quality: me.props.settingsProfile.preferredStreamQuality
+                        });
+
+                    }
+                    me.props.globalApplySettingsChanges();
 
                 } else {
 
@@ -149,21 +166,14 @@ class Settings extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
     handleApplyClick() {
-        if (this.props.settingsProfile.preferredStreamLanguage !== this.props.profile.preferredStreamLanguage ||
-            this.props.settingsProfile.preferredStreamQuality !== this.props.profile.preferredStreamQuality) {
-
-            this.props.homeSetVideosStreamPreferences({
-                language: this.props.settingsProfile.preferredStreamLanguage,
-                quality: this.props.settingsProfile.preferredStreamQuality
-            });
-
-        }
-        this.props.globalApplySettingsChanges();
+        console.log(this.props.settingsProfile);
+        this.applySettings();
     }
 
     settingsHasChanges() {
@@ -213,6 +223,7 @@ class Settings extends React.Component {
                                     label={Texts.USERNAME[this.props.profile.languageString]}
                                     type="text"
                                     fullWidth
+                                    disabled={true}
                                     required
                                 />
                             </FormControl>
@@ -381,6 +392,10 @@ export default connect(mapStateToProps, {
     globalSettingsSetSecondaryColor,
     globalResetSettingsChanges,
     globalApplySettingsChanges,
+
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalDisplayAlertDialog,
 
     homeSetVideosStreamPreferences
 })(withStyles(styles)(Settings));

@@ -84,6 +84,7 @@ const initialState = {
     addVideoModalCurrentVideoPoster: "",
 
     profile: {
+        id: -1,
         auth: false,
         isAdmin: true,
         username: "Macubix",
@@ -252,6 +253,7 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 profile: {
+                    id: action.payload.id,
                     auth: true,
                     isAdmin: action.payload.isAdmin,
                     username: action.payload.username,
@@ -260,7 +262,9 @@ export default (state = initialState, action) => {
                     darkMode: action.payload.darkMode,
                     primaryColor: action.payload.primaryColor,
                     secondaryColor: action.payload.secondaryColor,
-                    languageString: action.payload.languageString
+                    languageString: action.payload.languageString,
+                    preferredStreamLanguage: action.payload.preferredStreamLanguage,
+                    preferredStreamQuality: action.payload.preferredStreamQuality
                 },
                 settingsProfile: {
                     username: action.payload.username,
@@ -269,7 +273,9 @@ export default (state = initialState, action) => {
                     darkMode: action.payload.darkMode,
                     primaryColor: action.payload.primaryColor,
                     secondaryColor: action.payload.secondaryColor,
-                    languageString: action.payload.languageString
+                    languageString: action.payload.languageString,
+                    preferredStreamLanguage: action.payload.preferredStreamLanguage,
+                    preferredStreamQuality: action.payload.preferredStreamQuality
                 }
             };
         case GLOBAL_AUTH_FAILURE:

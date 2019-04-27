@@ -120,20 +120,23 @@ class Login extends React.Component {
 
                 if (response.status === 200) {
 
-                    localStorage.setItem('token', response.data);
+                    localStorage.setItem('token', response.data.token);
 
                     me.props.globalAuthSuccess({
-                        isAdmin: true,
-                        username: "Macubix",
-                        email: "macubix@gmail.com",
-                        pictureUrl: "",
-                        darkMode: false,
-                        primaryColor: "#338ABD",
-                        secondaryColor: "#F1580A",
-                        languageString: Languages.French,
-                        preferredStreamLanguage: Languages.French,
-                        preferredStreamQuality: VideoQualities.p360
+                        id: response.data.id,
+                        isAdmin: response.data.isAdmin,
+                        username: response.data.username,
+                        email: response.data.email,
+                        pictureUrl: response.data.pictureUrl,
+                        darkMode: response.data.darkMode,
+                        primaryColor: response.data.primaryColor,
+                        secondaryColor: response.data.secondaryColor,
+                        languageString: response.data.language,
+                        preferredStreamLanguage: response.data.preferredStreamLanguage,
+                        preferredStreamQuality: response.data.preferredStreamQuality
                     });
+
+                    console.log(me.props.profile);
 
                 } else {
 
