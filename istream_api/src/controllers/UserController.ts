@@ -153,6 +153,8 @@ createConnection(/*...*/).then(async connection => {
             user.primaryColor = reqUser.primaryColor
             user.secondaryColor = reqUser.secondaryColor
             user.email = reqUser.email
+            user.preferredStreamLanguage = reqUser.preferredStreamLanguage
+            user.preferredStreamQuality = reqUser.preferredStreamQuality
             
             user.username = reqUser.username
 
