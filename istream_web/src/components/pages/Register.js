@@ -169,7 +169,7 @@ class Register extends React.Component {
 
         let me = this;
 
-        params[Fields.USERNAME] = this.state.login;
+        params[Fields.USERNAME] = this.state.username;
         params[Fields.EMAIL] = this.state.email;
         params[Fields.PASSWORD] = this.state.password;
         params[Fields.LANGUAGE] = this.state.language;
@@ -222,7 +222,7 @@ class Register extends React.Component {
     handleRegisterClick() {
         console.log(this.state);
 
-        if (!this.state.loginError &&
+        if (!this.state.usernameError &&
             !this.state.passwordError &&
             !this.state.emailError) {
 

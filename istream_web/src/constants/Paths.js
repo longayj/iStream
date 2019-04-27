@@ -13,9 +13,9 @@ const Paths = {
 
     SEARCH: "/search",
 
-    LOGIN: "/login",
+    LOGIN: "/auth/login",
 
-    REGISTER: "/register"
+    REGISTER: "/auth/register"
 
 };
 
