@@ -54,6 +54,9 @@ class Home extends React.Component {
 
                     let videos = [];
 
+                    console.log(me.props.profile.preferredStreamLanguage);
+                    console.log(me.props.profile.preferredStreamQuality);
+
                     response.data.forEach(function (item) {
                         videos.push(new Video(item,
                             me.props.profile.preferredStreamLanguage,
@@ -74,6 +77,7 @@ class Home extends React.Component {
                 }
             },
             function (error) {
+                console.log(error);
 
                 me.props.globalDismissLoadMask();
 

@@ -230,7 +230,7 @@ class Video {
         const STREAM_PARAM = "?resolution=";
 
         return STREAM_PATH + this.streaming.id + STREAM_PARAM +
-            this.currentBestStreamingLanguage + this.currentBestStreamingQuality;
+            this.currentBestStreamingLanguage + this.currentBestStreamingQuality + "&token=" + localStorage.getItem('token');
     }
 
     setCurrentBestStreamingLanguage(value) {
@@ -296,6 +296,8 @@ class Video {
 
             if (identity[key] !== undefined &&
                 me.streaming[key] !== "") {
+
+                console.log(delta, preferredStreamLanguage);
 
                 if (delta[preferredStreamLanguage][identity[key].language] < keepBestLanguageDelta) {
                     keepBestLanguage = identity[key].language;
