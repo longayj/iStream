@@ -194,8 +194,8 @@ const Texts = {
         en: "Password reset"
     },
     PASSWORD_RULE: {
-        fr: "Le mot de passe doit contenir au moins 8 caractères et au moins une majuscule, une minuscule, un caractère spécial ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : ) et un chiffre.",
-        en: "The password must contain at least 8 characters and at least one up case, one low case, one special character ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : ) and one digit."
+        fr: "Le mot de passe doit contenir au moins 8 caractères et au moins une majuscule, une minuscule, un chiffre et un caractère spécial ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : ).",
+        en: "The password must contain at least 8 characters and at least one up case, one low case, one digit and one special character ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : )."
     },
     PLEASE_FILL_ALL_THE_FIELDS_CORRECTLY: {
         fr: "Veuillez remplir tous les champs correctement.",
