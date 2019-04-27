@@ -118,9 +118,17 @@ router.post('/login', async (req: Request, res: Response) => {
         config.jwtSecret,
       { expiresIn: "1h" }
     );
-
+    delete user.password
+    delete user.isVerify
+    delete user.isDisable
+    delete user.allDebridPassword
+    delete user.age
+    delete user.allDebridUsername 
     //Send the jwt in the response
-    res.send(token);
+    res.send({
+        ...user,
+        token: token
+    });
 })
 
 router.get('/refresh-token', [checkJwt], (req: Request, res: Response) => {
@@ -134,7 +142,7 @@ router.get('/refresh-token', [checkJwt], (req: Request, res: Response) => {
         { expiresIn: "1h" }
     );
     //Send the jwt in the response
-    res.send(token);        
+    res.send({token: token});        
 })
 
 }).catch(err => {

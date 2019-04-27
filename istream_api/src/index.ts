@@ -9,6 +9,7 @@ var cors = require('cors');
 
 import { VideoController, AllocineController, StreamController, ZoneTelechargementController, AuthController } from './controllers';
 import { AllDebridApi } from "./Utils";
+import { Usercontroller } from "./controllers/UserController";
 
 var port = 3001;
 
@@ -74,6 +75,7 @@ createConnection()
     app.use('/streams', StreamController);
     app.use('/zone', ZoneTelechargementController)
     app.use('/auth', AuthController)
+    app.use('/users', Usercontroller)
 
     app.get('/', function(req:any, res:express.Response){
         res.send('Welcome To iStream Api');
