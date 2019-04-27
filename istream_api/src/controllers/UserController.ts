@@ -80,7 +80,11 @@ createConnection(/*...*/).then(async connection => {
             delete user.password
             delete user.firstName
             delete user.lastName
-            res.send(user)
+            let resUser = {
+                ...user,
+                isAdmin: user.role == "ADMIN"
+            }
+            res.send(resUser)
         }).catch(err => {
             console.log(err)
             res.send({message: "Error to find Users"})
@@ -170,7 +174,11 @@ createConnection(/*...*/).then(async connection => {
                 delete saveUser.password
                 delete saveUser.firstName
                 delete saveUser.lastName
-                res.status(200).send(saveUser)
+                let resUser = {
+                    ...saveUser,
+                    isAdmin: user.role == "ADMIN"
+                }
+                res.status(200).send(resUser)
             }).catch(err => {
                 console.log(err)
                 res.status(500).send({message: 'user update error'})

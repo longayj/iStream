@@ -31,7 +31,7 @@ export class User {
     email: string = '';
 
     @Column()
-    role: string = '';
+    role: string = 'USER';
 
     @Column()
     username:string = '';
