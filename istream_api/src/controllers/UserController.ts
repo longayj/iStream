@@ -326,8 +326,12 @@ createConnection(/*...*/).then(async connection => {
     })
 
     router.post("/:id/playlists", [checkJwt],  (req: Request, res: Response) => {
-        let shared = req.body.shared || false
+        let shared = req.body.shared || 0
         let name = req.body.name || undefined
+        if (req.body.shared == "true")
+            shared = 1
+        else if (req.body.shared == "false")
+            shared = 0
         if (!name)
             return res.status(400).send("Bad request")
         if (res.locals.jwtPayload.userId != req.params.id)
