@@ -33,13 +33,13 @@ export class User {
     email: string = '';
 
     @Column()
-    role: string = '';
+    role: string = 'USER';
 
     @Column()
     username:string = '';
 
     @Column()
-    language:string = 'en';
+    language:string = 'fr';
 
     @Column()
     darkMode: boolean = false;
@@ -51,10 +51,10 @@ export class User {
     secondaryColor: string = "#F1580A";
 
     @Column()
-    preferredStreamLanguage: string = "French";
+    preferredStreamLanguage: string = "fr";
 
     @Column()
-    preferredStreamQuality: string = "p360"
+    preferredStreamQuality: string = "360p"
 
     @Column()
     allDebridUsername: string = '';

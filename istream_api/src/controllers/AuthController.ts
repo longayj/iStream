@@ -127,6 +127,7 @@ router.post('/login', async (req: Request, res: Response) => {
     //Send the jwt in the response
     res.send({
         ...user,
+        isAdmin: user.role == "ADMIN",
         token: token
     });
 })
