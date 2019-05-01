@@ -80,7 +80,6 @@ router.post('/register', (req: Request, res: Response) => {
     newUser.hashPassword();
     newUser.age = reqUser.age
     newUser.username = reqUser.username
-    newUser.email = reqUser.email
     connection.manager.save(newUser)
     .then(user => {
         res.status(200).send(user)
@@ -124,13 +123,11 @@ router.post('/login', async (req: Request, res: Response) => {
     delete user.isDisable
     delete user.allDebridPassword
     delete user.age
-    delete user.allDebridUsername
-
+    delete user.allDebridUsername 
     //Send the jwt in the response
     res.send({
         ...user,
-        token: token,
-        isAdmin: user.role == "ADMIN"
+        token: token
     });
 })
 

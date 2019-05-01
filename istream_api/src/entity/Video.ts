@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn, ManyToMany, ManyToOne} from "typeorm";
 import {Tag} from './Tag'
 import {Comment} from './Comment'
 import {Like} from './Like'
@@ -6,6 +6,8 @@ import { Statistics } from './Statistics';
 import { User } from "./User";
 import { CastingShort } from "./CastingShort";
 import { Streaming } from "./Streaming";
+import { Playlist } from "./Playlist";
+import { TimeVideo } from "./TimeVideo";
 
 @Entity()
 export class Video {
@@ -51,8 +53,14 @@ export class Video {
     @JoinColumn()
     castingShort: CastingShort;
 
-    @OneToMany(type => User, user => user.videos)
+    @ManyToOne(type => User, user => user.videos)
     user: User;
+
+    @ManyToMany(type => Playlist, playlist => playlist.videos)
+    playlists: Playlist[]
+
+    @OneToMany(type => TimeVideo, timevideo => timevideo.videos)
+    viewing: TimeVideo[]
 
     @OneToOne(type => Statistics, { onDelete: 'CASCADE' })
     @JoinColumn()

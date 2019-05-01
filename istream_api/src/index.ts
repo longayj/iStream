@@ -10,6 +10,7 @@ var cors = require('cors');
 import { VideoController, AllocineController, StreamController, ZoneTelechargementController, AuthController } from './controllers';
 import { AllDebridApi } from "./Utils";
 import { Usercontroller } from "./controllers/UserController";
+import { Playlistcontroller } from "./controllers/PlaylistController";
 
 var port = 3001;
 
@@ -19,10 +20,10 @@ createConnection()
     console.log("Inserting a new user into the database...");
     const user = new User();
     user.id = 1;
-    user.username = "john";
+    user.username = "admin";
     user.email = "test@test.com";
-    user.firstName = "John";
-    user.lastName = "Doe";
+    user.firstName = "Joe";
+    user.lastName = "LeBanjo";
     user.allDebridUsername = "";
     user.allDebridPassword = "";
     user.role = "ADMIN"
@@ -31,6 +32,20 @@ createConnection()
     user.hashPassword()
     await connection.manager.save(user);
     
+    const user2 = new User();
+    user2.id = 2;
+    user2.username = "john";
+    user2.email = "test@test.com";
+    user2.firstName = "John";
+    user2.lastName = "Doe";
+    user2.allDebridUsername = "";
+    user2.allDebridPassword = "";
+    user2.role = "USERS"
+    user2.age = 15;
+    user2.password = "password";
+    user2.hashPassword()
+    await connection.manager.save(user2);
+
     console.log("Saved a new user with id: " + user.id);
     
     AllDebridApi.getToken()
@@ -76,6 +91,7 @@ createConnection()
     app.use('/zone', ZoneTelechargementController)
     app.use('/auth', AuthController)
     app.use('/users', Usercontroller)
+    app.use('/playlists', Playlistcontroller)
 
     app.get('/', function(req:any, res:express.Response){
         res.send('Welcome To iStream Api');

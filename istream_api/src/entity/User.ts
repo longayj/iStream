@@ -1,9 +1,11 @@
 import "reflect-metadata";
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique, ManyToOne} from "typeorm";
 import { Like } from "./Like";
 import { Comment } from "./Comment";
 import { Video } from "./Video";
 import * as bcrypt from "bcryptjs";
+import { Playlist } from "./Playlist";
+import { TimeVideo } from "./TimeVideo";
 
 @Entity()
 @Unique(["username"])
@@ -31,13 +33,13 @@ export class User {
     email: string = '';
 
     @Column()
-    role: string = 'USER';
+    role: string = '';
 
     @Column()
     username:string = '';
 
     @Column()
-    language:string = 'fr';
+    language:string = 'en';
 
     @Column()
     darkMode: boolean = false;
@@ -49,10 +51,10 @@ export class User {
     secondaryColor: string = "#F1580A";
 
     @Column()
-    preferredStreamLanguage: string = "fr";
+    preferredStreamLanguage: string = "French";
 
     @Column()
-    preferredStreamQuality: string = "360p"
+    preferredStreamQuality: string = "p360"
 
     @Column()
     allDebridUsername: string = '';
@@ -68,6 +70,12 @@ export class User {
 
     @OneToMany(type => Video, video => video.user)
     videos: Video[];
+
+    @OneToMany(type => Playlist, playlist => playlist.owner)
+    playlists: Playlist[]
+
+    @OneToMany(type => Video, video => video.user)
+    viewing: TimeVideo[];
     
     @Column({nullable: true})
     isVerify: boolean = false;
