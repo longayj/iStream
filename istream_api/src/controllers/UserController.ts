@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import { createConnection, Any } from 'typeorm';
 import {User} from '../entity/User'
 import { checkJwt } from "../middlewares/checkJwt";
-import { checkRole } from "../middlewares/checkRole";
 import { Video } from '../entity';
 import { Playlist } from '../entity/Playlist';
 
@@ -532,7 +531,7 @@ createConnection(/*...*/).then(async connection => {
             console.log(user)
 
             let myWhere:any = {
-                ownerId:user.id
+                id: req.params.idPlaylist
             };
             if (userId != req.params.id) {
                 myWhere = {
@@ -542,10 +541,7 @@ createConnection(/*...*/).then(async connection => {
             }
 
             connection.getRepository(Playlist).findOne(1, {
-                where:{
-                    id: req.params.idPlaylist,
-                    ownerId: req.params.id
-                },
+                where:myWhere,
                 relations:["videos"]
             }).then(async playlist => {
                 if (playlist == undefined || playlist == null) {
@@ -569,6 +565,71 @@ createConnection(/*...*/).then(async connection => {
             res.status(500).send({message: "Error to find Users"})
         })
 
+    })
+
+    // get video in playlist
+    router.get("/:id/playlists/:idPlaylist/videos2", [checkJwt],  (req: Request, res: Response) => {
+        if (isNaN(req.params.idPlaylist) || isNaN(req.params.id))
+            return res.status(400).send("Bad request")
+        let userId = res.locals.jwtPayload.userId
+        // return all playlist
+        let page = req.query.page || 0
+        let per_page = req.query.per_page || 10
+        // limit superieur du nombre par page
+        if (per_page > 100)
+            per_page = 100
+        // limit inferieur du nombre par page
+        if (per_page <= 0)
+            per_page = 1
+        // limit inferieur des page
+        if (page <= 0)
+            page = 1
+        // les page commence a 0 donc -- 
+        --page
+        // check user id
+
+        connection.getRepository(User).findOne({ 
+            select: ["id"],
+            where: {
+                id: req.params.id
+            }
+        }).then(async user => {
+            if (user == undefined || user == null) {
+                res.status(404).send({message: "Id not found"});
+                return;
+            }
+            // subquery => permet de limiter par page les souffle en 
+            // fonction d'un id user !!!!! => limite de relation one to many
+            console.log(user)
+
+            let myWhere:any = {
+                id:req.params.idPlaylist
+            };
+            if (userId != req.params.id) {
+                myWhere = {
+                    ...myWhere,
+                    shared: 1
+                }
+            }
+
+            let query = connection.getRepository(Playlist).createQueryBuilder('playlist')
+            .leftJoinAndSelect("playlist.videos", "video")
+            .offset(per_page)
+            .skip(per_page * page)
+            .getQuery();
+
+            console.log("query : ", query)
+            res.send('Test')
+            // let videoRes:any = new Object
+            // videoRes.per_page = playlist.videos.length
+            // videoRes.page = 1
+            // videoRes.total_video = playlist.videos.length;
+            // videoRes.videos = playlist.videos
+            // res.send(videoRes)
+        }).catch(err => {
+            console.log(err)
+            res.send("Err !")
+        })
     })
 
 }).catch(error => {

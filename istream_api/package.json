@@ -5,7 +5,7 @@
    "devDependencies": {
       "ts-node": "3.3.0",
       "@types/node": "^8.0.29",
-      "typescript": "2.5.2"
+      "typescript": "3.4.3"
    },
    "dependencies": {
       "allocine-api": "^0.1.9",
@@ -20,12 +20,13 @@
       "request-x-ray": "^0.1.4",
       "sqlite3": "^3.1.10",
       "tsc-watch": "^2.1.2",
-      "typeorm": "^0.3.0-alpha.22",
+      "typeorm": "^0.3.0-alpha.23",
       "x-ray": "^2.3.3"
    },
    "scripts": {
       "start": "ts-node src/index.ts",
       "generate": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:generate",
-      "sync": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:sync"
+      "sync": "./node_modules/.bin/ts-node ./node_modules/typeorm/cli.js schema:sync",
+      "build": "npm install; gulp copy; gulp watch & tsc-watch -p . --onSuccess \"node build/index.js\""
    }
 }

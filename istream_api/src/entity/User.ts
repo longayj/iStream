@@ -41,19 +41,19 @@ export class User {
     @Column()
     language:string = 'fr';
 
-    @Column()
+    @Column({nullable: true})
     darkMode: boolean = false;
 
-    @Column()
+    @Column({nullable: true})
     primaryColor: string = "#338ABD";
 
-    @Column()
+    @Column({nullable: true})
     secondaryColor: string = "#F1580A";
 
-    @Column()
+    @Column({nullable: true})
     preferredStreamLanguage: string = "fr";
 
-    @Column()
+    @Column({nullable: true})
     preferredStreamQuality: string = "360p"
 
     @Column()

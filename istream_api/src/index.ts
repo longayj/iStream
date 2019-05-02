@@ -11,6 +11,8 @@ import { VideoController, AllocineController, StreamController, ZoneTelechargeme
 import { AllDebridApi } from "./Utils";
 import { Usercontroller } from "./controllers/UserController";
 import { Playlistcontroller } from "./controllers/PlaylistController";
+import { Playlist } from "./entity/Playlist";
+import { Video } from "./entity";
 
 var port = 3001;
 
@@ -47,22 +49,45 @@ createConnection()
     await connection.manager.save(user2);
 
     console.log("Saved a new user with id: " + user.id);
-    
-    AllDebridApi.getToken()
-    .then(result => {
-        if (result.data.success == false)
-            return
-        AllDebridApi.setDefaultToken(result.data.token);
-        return true;
-    }).catch(res => {
-        console.log(res.response.statusText)
-        console.log("you can't add new movie, verify your file ./configs/private.json")
-        return false;
-    })
 
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
+    let playlist = new Playlist();
+    playlist.id = 1;
+    playlist.name = "First Playlist"
+    playlist.shared = 0
+    playlist.owner = user
+    await connection.manager.save(playlist);
+    playlist = new Playlist();
+    playlist.id = 2;
+    playlist.name = "Second Playlist"
+    playlist.shared = 1
+    playlist.owner = user
+    await connection.manager.save(playlist);
+
+    let video = new Video();
+    video.id = 1;
+    video.title = "The Best Movie"
+    video.url = "http://....."
+    video.synopsis = "The Storie of best movie"
+    video.description = "The Best description"
+    video.filename = "Filename of the BestMovie"
+    video.productionYear = 1900
+    await connection.manager.save(video)
+
+    // AllDebridApi.getToken()
+    // .then(result => {
+    //     if (result.data.success == false)
+    //         return
+    //     AllDebridApi.setDefaultToken(result.data.token);
+    //     return true;
+    // }).catch(res => {
+    //     console.log(res.response.statusText)
+    //     console.log("you can't add new movie, verify your file ./configs/private.json")
+    //     return false;
+    // })
+
+    //console.log("Loading users from the database...");
+    //const users = await connection.manager.find(User);
+    //console.log("Loaded users: ", users);
     
     var app = require('express')();
     var server = require('http').createServer(app);

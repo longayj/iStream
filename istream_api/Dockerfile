@@ -28,7 +28,7 @@
 	WORKDIR $HOME/$SUBDIR
 
 # As this user, finally run NPM install
-	RUN npm install && npm cache verify
+	RUN npm install && npm cache verify && npm run sync
 
 ## These lines are not necessary because we're creating a volume from the docker-compose.yml file.
 ## If we were to not use a volume there, these would be necessary
