@@ -15,7 +15,7 @@ import {
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
 
@@ -53,9 +53,6 @@ class Home extends React.Component {
                 if (response.status === 200) {
 
                     let videos = [];
-
-                    console.log(me.props.profile.preferredStreamLanguage);
-                    console.log(me.props.profile.preferredStreamQuality);
 
                     response.data.forEach(function (item) {
                         videos.push(new Video(item,
@@ -110,12 +107,16 @@ class Home extends React.Component {
             <div>
 
                 <Toolbar>
-                    <IconButton
+                    <Button
+                        variant={"contained"}
                         onClick={this.handleAddVideoClick.bind(this)}
                     >
-                        <AddToQueueIcon />
-                    </IconButton>
+                        <AddToQueueIcon />&nbsp;
+                        {Texts.ADD_A_VIDEO[this.props.profile.languageString]}
+                    </Button>
                 </Toolbar>
+
+                <br/>
 
                 <Grid container spacing={24} style={{padding: 24}}>
                     {

@@ -56,6 +56,14 @@ const Texts = {
         fr: "Personnalisation",
         en: "Customisation"
     },
+    CREATE: {
+        fr: "Créer",
+        en: "Create"
+    },
+    CREATE_PLAYLIST: {
+        fr: "Créer une playlist",
+        en: "Create a playlist"
+    },
 
 
     /* D */
@@ -141,6 +149,10 @@ const Texts = {
         fr: "Langage",
         en: "Language"
     },
+    LEAVE_A_COMMENT: {
+        fr: "Laisser un commentaire !",
+        en: "Leave a comment !"
+    },
     LIKE: {
         fr: "J'aime",
         en: "Like"
@@ -162,11 +174,19 @@ const Texts = {
         fr: "Film",
         en: "Movie"
     },
+    MY_VIDEOS: {
+        fr: "Mes vidéos",
+        en: "My videos"
+    },
 
 
     /* N */
 
 
+    NAME: {
+        fr: "Nom",
+        en: "Name"
+    },
     NETWORK_ERROR: {
         fr: "Erreur réseau",
         en: "Network error"
@@ -176,6 +196,10 @@ const Texts = {
     /* O */
 
 
+    OF: {
+        fr: "de",
+        en: "of"
+    },
     OK: {
         fr: "OK",
         en: "OK"
@@ -196,6 +220,26 @@ const Texts = {
     PASSWORD_RULE: {
         fr: "Le mot de passe doit contenir au moins 8 caractères et au moins une majuscule, une minuscule, un chiffre et un caractère spécial ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : ).",
         en: "The password must contain at least 8 characters and at least one up case, one low case, one digit and one special character ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : )."
+    },
+    PLAY: {
+        fr: "Lecture",
+        en: "Play"
+    },
+    PLAYLIST: {
+        fr: "Liste de lecture",
+        en: "Playlist"
+    },
+    PLAYLIST_CREATED: {
+        fr: "Liste de lecture créée !",
+        en: "Playlist created !"
+    },
+    PLAYLIST_UPDATED: {
+        fr: "Liste de lecture mise à jour !",
+        en: "Playlist updated !"
+    },
+    PLAYLISTS: {
+        fr: "Listes de lecture",
+        en: "Playlists"
     },
     PLEASE_FILL_ALL_THE_FIELDS_CORRECTLY: {
         fr: "Veuillez remplir tous les champs correctement.",
@@ -259,6 +303,10 @@ const Texts = {
     /* S */
 
 
+    SAVE: {
+        fr: "Sauvegarder",
+        en: "Save"
+    },
     SEARCH_ON_ZONE_TELECHARGEMENT: {
         fr: "Rechercher sur Zone Téléchargement",
         en: "Search on Zone Téléchargement"
@@ -271,6 +319,10 @@ const Texts = {
         fr: "Sélectionner votre langage",
         en: "Select your language"
     },
+    SEND: {
+        fr: "Envoyer",
+        en: "Send"
+    },
     SERIE: {
         fr: "Série",
         en: "Serie"
@@ -278,6 +330,10 @@ const Texts = {
     SETTINGS: {
         fr: "Paramètres",
         en: "Settings"
+    },
+    SHARE: {
+        fr: "Partager",
+        en: "Share"
     },
     SIGN_IN: {
         fr: "Se connecter",
@@ -329,6 +385,10 @@ const Texts = {
     VIDEO: {
         fr: "Vidéo",
         en: "Video"
+    },
+    VIDEOS: {
+        fr: "Vidéos",
+        en: "Videos"
     },
     VIDEO_ADDED: {
         fr: "Vidéo ajoutée !",

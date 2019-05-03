@@ -12,6 +12,9 @@ import {
     GLOBAL_DISPLAY_CONFIRM_DIALOG,
     GLOBAL_DISMISS_CONFIRM_DIALOG,
 
+    GLOBAL_DISPLAY_CREATE_PLAYLIST_MODAL,
+    GLOBAL_DISMISS_CREATE_PLAYLIST_MODAL,
+
     GLOBAL_DISPLAY_ADD_VIDEO_MODAL,
     GLOBAL_DISMISS_ADD_VIDEO_MODAL,
     GLOBAL_ADD_VIDEO_MODAL_SET_VIDEO_TITLE,
@@ -39,8 +42,9 @@ import {
     GLOBAL_SET_NAVIGATION,
     GLOBAL_SET_MOBILE_DRAWER_IS_OPEN,
 
-    GLOBAL_FAVORITE_IS_LOAD,
+    GLOBAL_PLAYLISTS_IS_LOAD,
     GLOBAL_HOME_IS_LOAD,
+    GLOBAL_MY_VIDEOS_IS_LOAD,
 
     GLOBAL_RESET
 
@@ -67,6 +71,8 @@ const initialState = {
     confirmTarget: "",
     confirmCallBackFunc: function () {},
     confirmCallBackProps: {},
+
+    showCreatePlaylistModal: false,
 
     showAddVideoModal: false,
     addVideoModalVideoTitle: "",
@@ -116,7 +122,8 @@ const initialState = {
     settingsToggleActive: false,
 
     homeIsLoad: false,
-    favoriteIsLoad: false
+    myVideosIsLoad: false,
+    playlistsIsLoad: false
 };
 
 export default (state = initialState, action) => {
@@ -179,6 +186,17 @@ export default (state = initialState, action) => {
                 confirmTarget: initialState.confirmTarget,
                 confirmCallBackFunc: initialState.confirmCallBackFunc,
                 confirmCallBackProps: initialState.confirmCallBackProps
+            };
+
+        case GLOBAL_DISPLAY_CREATE_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showCreatePlaylistModal: true
+            };
+        case GLOBAL_DISMISS_CREATE_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showCreatePlaylistModal: false
             };
 
         case GLOBAL_DISPLAY_ADD_VIDEO_MODAL:
@@ -399,10 +417,15 @@ export default (state = initialState, action) => {
                 ...state,
                 homeIsLoad: true
             };
-        case GLOBAL_FAVORITE_IS_LOAD:
+        case GLOBAL_MY_VIDEOS_IS_LOAD:
             return {
                 ...state,
-                favoriteIsLoad: true
+                myVideosIsLoad: true
+            };
+        case GLOBAL_PLAYLISTS_IS_LOAD:
+            return {
+                ...state,
+                playlistsIsLoad: true
             };
         case GLOBAL_RESET:
             return initialState;

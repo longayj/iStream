@@ -22,6 +22,10 @@ class Validator {
     static url(text) {
         return text.length > 5;
     }
+
+    static name(text) {
+        return text != null && text != "" && text.length > 0;
+    }
 }
 
 export default Validator;

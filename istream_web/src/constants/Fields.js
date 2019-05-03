@@ -1,4 +1,5 @@
 const Fields = {
+    NAME: "name",
     USERNAME: "username",
     PASSWORD: "password",
     EMAIL: "email",
@@ -17,6 +18,7 @@ const Fields = {
     SECONDARY_COLOR: "secondaryColor",
     PREFERRED_STREAM_LANGUAGE: "preferredStreamLanguage",
     PREFERRED_STREAM_QUALITY: "preferredStreamQuality",
+    SHARED: "shared"
 };
 
 export default Fields;

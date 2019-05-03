@@ -1,6 +1,6 @@
 const Paths = {
 
-    //HOST: "http://192.168.1.41:3001",
+    //HOST: "http://192.168.0.40:3001",
     HOST: "http://localhost:3001",
 
     VIDEOS: "/videos",
@@ -17,7 +17,9 @@ const Paths = {
 
     REGISTER: "/auth/register",
 
-    USER: '/users'
+    USER: '/users',
+
+    PLAYLISTS: "/playlists"
 
 };
 

@@ -19,7 +19,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 
 import Home from "./pages/Home";
 import Zone from "./pages/Zone";
-import Favorites from "./pages/Favorites";
+import Playlists from "./pages/Playlists";
+import MyVideos from "./pages/MyVideos";
 
 import Video from "./pages/Video";
 import Settings from "./pages/Settings";
@@ -34,7 +35,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
 import HomeIcon from '@material-ui/icons/Home';
-import FavoriteIcon from '@material-ui/icons/Favorite';
+import PlaylistIcon from '@material-ui/icons/PlaylistPlay';
+import VideoIcon from '@material-ui/icons/VideoLibrary';
 import PlayArrayIcon from '@material-ui/icons/PlayArrow';
 import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
@@ -50,6 +52,7 @@ import LoadMask from "./LoadMask";
 import AlertDialog from "./modals/AlertDialog";
 import ConfirmDialog from "./modals/ConfirmDialog";
 import AddVideoModal from "./modals/AddVideoModal";
+import CreatePlaylistModal from "./modals/CreatePlaylistModal";
 
 import NotificationSnackbar from "./NotificationSnackbar";
 
@@ -74,6 +77,8 @@ class App extends React.Component {
             keepPrevRouteSettings: this.props.location.pathname,
             settingsToggleActive: (this.props.location.pathname === "/settings")
         });
+
+        console.log("hahahahaahah ==> ", this.props.location.pathname);
     }
 
     handleSelectChange(route) {
@@ -156,13 +161,20 @@ class App extends React.Component {
                 component: Zone,
                 route: "/zone",
                 icon: <SearchIcon/>,
+                display: this.props.profile.isAdmin
+            },
+            {
+                name: Texts.MY_VIDEOS[this.props.profile.languageString],
+                component: MyVideos,
+                route: "/myvideos",
+                icon: <VideoIcon/>,
                 display: true
             },
             {
-                name: Texts.FAVORITES[this.props.profile.languageString],
-                component: Favorites,
-                route: "/favorites",
-                icon: <FavoriteIcon/>,
+                name: Texts.PLAYLISTS[this.props.profile.languageString],
+                component: Playlists,
+                route: "/playlists",
+                icon: <PlaylistIcon/>,
                 display: true
             },
             {
@@ -238,12 +250,14 @@ class App extends React.Component {
                                     <Route exact path={"/"} component={Home} />
                                     <Route path="/home" component={Home} />
                                     <Route path="/zone" component={Zone}/>
-                                    <Route path="/favorites" component={Favorites} />
+                                    <Route path="/myvideos" component={MyVideos} />
+                                    <Route path="/playlists" component={Playlists} />
 
                                     <Route path="/video" component={Video} />
                                     <Route path="/settings" component={Settings} />
 
                                     <AddVideoModal/>
+                                    <CreatePlaylistModal/>
 
                                     <LoadMask
                                         show={this.props.showLoadMask}

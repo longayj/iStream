@@ -29,7 +29,8 @@ import {
     globalAuthSuccess,
     globalDisplayLoadMask,
     globalDismissLoadMask,
-    globalDisplayAlertDialog
+    globalDisplayAlertDialog,
+    globalSetNavigation
 } from "../../redux/actions/globalActions";
 
 import VideoQualities from "../../constants/VideoQualities";
@@ -122,6 +123,12 @@ class Login extends React.Component {
 
                     localStorage.setItem('token', response.data.token);
 
+                    me.props.globalSetNavigation({
+                        selectedRoute: "/",
+                        keepPrevRouteSettings: "/",
+                        settingsToggleActive: false
+                    });
+
                     me.props.globalAuthSuccess({
                         id: response.data.id,
                         isAdmin: response.data.isAdmin,
@@ -135,8 +142,6 @@ class Login extends React.Component {
                         preferredStreamLanguage: response.data.preferredStreamLanguage,
                         preferredStreamQuality: response.data.preferredStreamQuality
                     });
-
-                    console.log(me.props.profile);
 
                 } else {
 
@@ -162,7 +167,8 @@ class Login extends React.Component {
 
                     me.props.globalDisplayAlertDialog({
                         title: Texts.ERROR_OCCURED[me.props.profile.languageString],
-                        text: Status[error.response.status][me.props.profile.languageString]
+                        text: Status[error.response.status][me.props.profile.languageString] +
+                        " " + (error.response.data.message != undefined ? error.response.data.message : "")
                     });
 
                 }
@@ -171,10 +177,18 @@ class Login extends React.Component {
     }
 
     handleSignInClick() {
-        console.log(this.state);
         //if (!this.state.loginError && !this.state.passwordError) {
             this.login();
         //}
+    }
+
+    handlePressEnter(ev) {
+
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+
+            this.handleSignInClick();
+        }
     }
 
     render() {
@@ -236,6 +250,7 @@ class Login extends React.Component {
                                 required
                                 error={this.state.loginError}
                                 helperText={Texts.LOGIN_AUTHENTICATION_RULE[this.state.languageString]}
+                                onKeyPress={this.handlePressEnter.bind(this)}
                             />
 
                             <TextField
@@ -247,6 +262,7 @@ class Login extends React.Component {
                                 fullWidth
                                 required
                                 error={this.state.passwordError}
+                                onKeyPress={this.handlePressEnter.bind(this)}
                             />
 
                             <Link to={{
@@ -289,5 +305,6 @@ export default withRouter(connect(mapStateToProps, {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalAuthSuccess,
-    globalDisplayAlertDialog
+    globalDisplayAlertDialog,
+    globalSetNavigation
 })(withStyles(styles, { withTheme: true })(Login)));

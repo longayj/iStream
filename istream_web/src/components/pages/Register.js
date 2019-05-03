@@ -211,7 +211,8 @@ class Register extends React.Component {
 
                     me.props.globalDisplayAlertDialog({
                         title: Texts.ERROR_OCCURED[me.props.profile.languageString],
-                        text: Status[error.response.status][me.props.profile.languageString]
+                        text: Status[error.response.status][me.props.profile.languageString] +
+                        " " + (error.response.data.message != undefined ? error.response.data.message : "")
                     });
 
                 }
