@@ -15,6 +15,9 @@ import {
     GLOBAL_DISPLAY_CREATE_PLAYLIST_MODAL,
     GLOBAL_DISMISS_CREATE_PLAYLIST_MODAL,
 
+    GLOBAL_DISPLAY_ADD_VIDEO_TO_PLAYLIST_MODAL,
+    GLOBAL_DISMISS_ADD_VIDEO_TO_PLAYLIST_MODAL,
+
     GLOBAL_DISPLAY_ADD_VIDEO_MODAL,
     GLOBAL_DISMISS_ADD_VIDEO_MODAL,
     GLOBAL_ADD_VIDEO_MODAL_SET_VIDEO_TITLE,
@@ -41,6 +44,8 @@ import {
 
     GLOBAL_SET_NAVIGATION,
     GLOBAL_SET_MOBILE_DRAWER_IS_OPEN,
+
+    GLOBAL_LOGOUT,
 
     GLOBAL_PLAYLISTS_IS_LOAD,
     GLOBAL_HOME_IS_LOAD,
@@ -74,6 +79,9 @@ const initialState = {
 
     showCreatePlaylistModal: false,
 
+    showAddVideoToPlaylistModal: false,
+    addVideoToPlaylistModalVideoTitle: "",
+
     showAddVideoModal: false,
     addVideoModalVideoTitle: "",
     addVideoModalVideoTitleError: true,
@@ -93,8 +101,8 @@ const initialState = {
         id: -1,
         auth: false,
         isAdmin: true,
-        username: "Macubix",
-        email: "macubix@gmail.com",
+        username: "",
+        email: "",
         pictureUrl: "",
         darkMode: false,
         primaryColor: "#338ABD",
@@ -105,8 +113,8 @@ const initialState = {
     },
 
     settingsProfile: {
-        username: "Macubix",
-        email: "macubix@gmail.com",
+        username: "",
+        email: "",
         pictureUrl: "",
         darkMode: false,
         primaryColor: "#338ABD",
@@ -197,6 +205,19 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 showCreatePlaylistModal: false
+            };
+
+        case GLOBAL_DISPLAY_ADD_VIDEO_TO_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showAddVideoToPlaylistModal: true,
+                addVideoToPlaylistModalVideoTitle: action.payload
+            };
+        case GLOBAL_DISMISS_ADD_VIDEO_TO_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showAddVideoToPlaylistModal: false,
+                addVideoToPlaylistModalVideoTitle: initialState.addVideoToPlaylistModalVideoTitle
             };
 
         case GLOBAL_DISPLAY_ADD_VIDEO_MODAL:
@@ -411,6 +432,13 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 mobileDrawerOpen: action.payload
+            };
+        case GLOBAL_LOGOUT:
+            return {
+                ...state,
+                homeIsLoad: false,
+                myVideosIsLoad: false,
+                playlistsIsLoad: false
             };
         case GLOBAL_HOME_IS_LOAD:
             return {

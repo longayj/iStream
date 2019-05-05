@@ -23,6 +23,8 @@ import {
     globalDisplayAlertDialog,
     globalPlaylistsIsLoad,
 
+    globalReset,
+
     globalDisplayCreatePlaylistModal
 } from "../../redux/actions/globalActions";
 
@@ -42,6 +44,7 @@ import {
 import Validator from "../../utils/Validator";
 import Fields from "../../constants/Fields";
 import Video from "../../models/Video";
+import {withRouter} from "react-router-dom";
 
 
 class Playlists extends React.Component {
@@ -57,10 +60,21 @@ class Playlists extends React.Component {
         };
     }
 
+    componentDidMount() {
+        if (this.props.playlistsIsLoad === false) {
+            this.getMyPlaylists();
+        }
+    }
+
     getVideos(id) {
         let params = {};
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.USER + "/" + this.props.profile.id + Paths.PLAYLISTS + "/" + id + Paths.VIDEOS, params);
@@ -124,6 +138,11 @@ class Playlists extends React.Component {
 
         let me = this;
 
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
+
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.PUT, Paths.HOST + Paths.USER + "/" + this.props.profile.id + Paths.PLAYLISTS + "/" + this.state.playlist_id, params);
         communication.sendRequest(
@@ -174,16 +193,15 @@ class Playlists extends React.Component {
         );
     }
 
-    componentDidMount() {
-        if (this.props.playlistsIsLoad === false) {
-            this.getMyPlaylists();
-        }
-    }
-
     getMyPlaylists() {
         let params = {};
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.USER + "/" + this.props.profile.id + Paths.PLAYLISTS, params);
@@ -314,6 +332,7 @@ class Playlists extends React.Component {
 
                 <Toolbar>
                     <Button
+                        color={"primary"}
                         variant={"contained"}
                         onClick={this.handleAddPlaylistClick.bind(this)}
                     >
@@ -344,7 +363,7 @@ class Playlists extends React.Component {
                                             <ListItemSecondaryAction>
                                                 <IconButton
                                                     aria-label="Delete"
-                                                    onClick={this.handleDeletePlaylistClick.bind()}
+                                                    onClick={this.handleDeletePlaylistClick.bind(this)}
                                                 >
                                                     <DeleteIcon />
                                                 </IconButton>
@@ -435,11 +454,11 @@ class Playlists extends React.Component {
                                                         <ListItemIcon>
                                                             <VideoIcon />
                                                         </ListItemIcon>
-                                                        <ListItemText primary={item.title + ", " + item.castingShort.directors + " (" + item.releaseDate + ")"} />
+                                                        <ListItemText primary={item.title + ", " + item.castingShort.directors + " (" + item.productionYear + ")"} />
                                                         <ListItemSecondaryAction>
                                                             <IconButton
                                                                 aria-label="Delete"
-                                                                onClick={this.handleDeleteVideoClick.bind()}
+                                                                onClick={this.handleDeleteVideoClick.bind(this)}
                                                             >
                                                                 <DeleteIcon />
                                                             </IconButton>
@@ -469,7 +488,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
     globalMyVideosIsLoad,
     globalDisplayLoadMask,
     globalDismissLoadMask,
@@ -477,6 +496,8 @@ export default connect(mapStateToProps, {
     globalPlaylistsIsLoad,
     globalDisplayCreatePlaylistModal,
 
+    globalReset,
+
     playlistsSetPlaylists,
     playlistsUpdatePlaylist
-})(Playlists);
+})(Playlists));

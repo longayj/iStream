@@ -1,4 +1,5 @@
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 import HttpMethods from '../constants/HttpMethods';
 
 class Communication {
@@ -6,6 +7,32 @@ class Communication {
         this.method = method;
         this.path = path;
         this.params = params;
+    }
+
+    static checkToken() {
+        let token = localStorage.getItem('token');
+
+        if (token == null || token == "") {
+            return false;
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, "@QEGTUI");
+        } catch (e) {
+            return false;
+        }
+
+        if (decoded == null || (new Date().getTime() / 1000) > decoded.exp) {
+            return false;
+        }
+        return true;
+    }
+
+    static getTokenId() {
+        let token = localStorage.getItem('token');
+        let decoded = jwt.verify(token, "@QEGTUI");
+        return decoded.userId;
     }
 
     sendRequest(thenFunc, catchFunc, auth) {

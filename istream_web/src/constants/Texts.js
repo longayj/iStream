@@ -23,6 +23,14 @@ const Texts = {
         fr: "Ajouter une vidéo",
         en: "Add a video"
     },
+    ADD_A_VIDEO_TO_A_PLAYLIST: {
+        fr: "Ajouter une vidéo à une liste de lecture",
+        en: "Add a video to a playlist"
+    },
+    ADD_TO_A_PLAYLIST: {
+        fr: "Ajouter à une liste de lecture",
+        en: "Add to a playlist"
+    },
     AN_EMAIL_HAS_BEEN_SENT_TO_YOU_WITH_YOUR_NEW_PASSWORD: {
         fr: "Un email vous a été envoyé avec votre nouveau mot de passe. Vérifier votre boite mail pour pouvoir vous connecter.",
         en: "An email has been sent to you with your new password. Check your mailbox to be able to sign in."
@@ -164,6 +172,10 @@ const Texts = {
     LOGIN_AUTHENTICATION_RULE: {
         fr: "Vous pouvez utiliser, au choix, votre nom d'utilisateur ou votre adresse email pour vous authentifier.",
         en: "You can use either your username or your email address in order to authenticate."
+    },
+    LOGOUT: {
+        fr: "Se déconnecter",
+        en: "Logout"
     },
 
 
@@ -307,6 +319,10 @@ const Texts = {
         fr: "Sauvegarder",
         en: "Save"
     },
+    SEARCH: {
+        fr: "Rechercher...",
+        en: "Search..."
+    },
     SEARCH_ON_ZONE_TELECHARGEMENT: {
         fr: "Rechercher sur Zone Téléchargement",
         en: "Search on Zone Téléchargement"
@@ -318,6 +334,10 @@ const Texts = {
     SELECT_YOUR_LANGUAGE: {
         fr: "Sélectionner votre langage",
         en: "Select your language"
+    },
+    SELECT_A_PLAYLIST_TO_ADD_THIS_VIDEO_TO: {
+        fr: "Sélectionner une liste de lecture à laquelle ajouter cette video",
+        en: "Select a playlist to add this video to"
     },
     SEND: {
         fr: "Envoyer",

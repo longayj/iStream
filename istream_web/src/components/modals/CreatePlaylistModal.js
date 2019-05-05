@@ -9,7 +9,9 @@ import {
 
     globalDisplayAlertDialog,
 
-    globalDismissCreatePlaylistModal
+    globalDismissCreatePlaylistModal,
+
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -38,6 +40,7 @@ import Status from "../../constants/Status";
 import Texts from "../../constants/Texts";
 import {Checkbox, FormControlLabel} from "@material-ui/core/es/index";
 import Playlist from "../../models/Playlist";
+import {withRouter} from "react-router-dom";
 
 class CreatePlaylistModal extends React.Component {
 
@@ -75,6 +78,11 @@ class CreatePlaylistModal extends React.Component {
         params[Fields.SHARED] = this.state.shared;
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.USER + "/" + this.props.profile.id + Paths.PLAYLISTS, params);
@@ -155,10 +163,8 @@ class CreatePlaylistModal extends React.Component {
                     maxWidth={"sm"}
                     fullWidth={true}
                     onClose={this.handleClose.bind(this)}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">
+                    <DialogTitle>
                         {
                             Texts.CREATE_PLAYLIST[this.props.profile.languageString]
                         }
@@ -214,7 +220,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
     //GLOBAL
     globalDisplayLoadMask,
     globalDismissLoadMask,
@@ -225,7 +231,9 @@ export default connect(mapStateToProps, {
 
     globalDismissCreatePlaylistModal,
 
+    globalReset,
+
     //PLAYLISTS
 
     playlistsAddPlaylist
-})(CreatePlaylistModal);
+})(CreatePlaylistModal));

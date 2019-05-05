@@ -1,12 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from '@material-ui/core/styles';
 
 import {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayAddVideoModal,
     globalDisplayAlertDialog,
-    globalHomeIsLoad
+    globalHomeIsLoad,
+
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -17,6 +20,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
+import SearchIcon from '@material-ui/icons/Search';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
 
 import VideoCard from "../VideoCard";
@@ -29,6 +33,59 @@ import HttpMethods from "../../constants/HttpMethods";
 import Paths from "../../constants/Paths";
 import Status from "../../constants/Status";
 import Texts from "../../constants/Texts";
+import {withRouter} from "react-router-dom";
+import {fade} from "@material-ui/core/es/styles/colorManipulator";
+import {IconButton, InputBase} from "@material-ui/core/es/index";
+
+const styles = theme => ({
+    root: {
+        display: 'flex',
+    },
+    grow: {
+        flexGrow: 1,
+    },
+    search: {
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: fade(theme.palette.primary.main, 0.50),
+        '&:hover': {
+            backgroundColor: fade(theme.palette.primary.main, 0.75),
+        },
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            marginLeft: theme.spacing.unit,
+            width: 'auto',
+        },
+    },
+    searchIcon: {
+        width: theme.spacing.unit * 9,
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    inputRoot: {
+        color: 'inherit',
+        width: '100%',
+    },
+    inputInput: {
+        paddingTop: theme.spacing.unit,
+        paddingRight: theme.spacing.unit,
+        paddingBottom: theme.spacing.unit,
+        paddingLeft: theme.spacing.unit * 10,
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            width: 120,
+            '&:focus': {
+                width: 200,
+            },
+        },
+    },
+});
 
 class Home extends React.Component {
 
@@ -42,6 +99,11 @@ class Home extends React.Component {
         let params = {};
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.VIDEOS, params);
@@ -97,23 +159,43 @@ class Home extends React.Component {
         );
     }
 
+    handleSearchClick() {
+
+    }
+
     handleAddVideoClick() {
         this.props.globalDisplayAddVideoModal();
     }
 
     render() {
 
+        const { classes } = this.props;
+
         return (
             <div>
 
-                <Toolbar>
+                <Toolbar className={classes.root}>
                     <Button
+                        color={"primary"}
                         variant={"contained"}
                         onClick={this.handleAddVideoClick.bind(this)}
                     >
                         <AddToQueueIcon />&nbsp;
                         {Texts.ADD_A_VIDEO[this.props.profile.languageString]}
                     </Button>
+                    <div className={classes.grow} />
+                    <div className={classes.search}>
+                        <div className={classes.searchIcon}>
+                            <SearchIcon />
+                        </div>
+                        <InputBase
+                            placeholder={Texts.SEARCH[this.props.profile.languageString]}
+                            classes={{
+                                root: classes.inputRoot,
+                                input: classes.inputInput,
+                            }}
+                        />
+                    </div>
                 </Toolbar>
 
                 <br/>
@@ -145,7 +227,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
     //GLOBAL
     globalDisplayLoadMask,
     globalDismissLoadMask,
@@ -153,7 +235,9 @@ export default connect(mapStateToProps, {
     globalDisplayAlertDialog,
     globalHomeIsLoad,
 
+    globalReset,
+
     //HOME
     homeSetVideos
 
-})(Home);
+})(withStyles(styles)(Home)));

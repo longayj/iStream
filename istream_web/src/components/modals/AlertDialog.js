@@ -20,16 +20,14 @@ class AlertDialog extends React.Component {
                     maxWidth={"sm"}
                     fullWidth={true}
                     onClose={this.props.onClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">
+                    <DialogTitle>
                         {
                             this.props.title
                         }
                     </DialogTitle>
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
+                        <DialogContentText>
                             {
                                 this.props.text
                             }

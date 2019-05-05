@@ -104,6 +104,8 @@ class Layout extends React.Component {
 
                         {this.props.appBarRight}
 
+                        {this.props.logoutButton}
+
                     </Toolbar>
 
                 </AppBar>
@@ -159,6 +161,7 @@ class Layout extends React.Component {
 Layout.defaultProps = {
     brand: "",
     appBarRight: null,
+    logoutButton: null,
     navigationMenu: null
 };
 
@@ -169,6 +172,7 @@ Layout.propTypes = {
     theme: PropTypes.object.isRequired,
     brand: PropTypes.string,
     appBarRight: PropTypes.object,
+    logoutButton: PropTypes.object,
     navigationMenu: PropTypes.object
 };
 

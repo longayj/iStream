@@ -15,6 +15,9 @@ import {
     GLOBAL_DISPLAY_CREATE_PLAYLIST_MODAL,
     GLOBAL_DISMISS_CREATE_PLAYLIST_MODAL,
 
+    GLOBAL_DISPLAY_ADD_VIDEO_TO_PLAYLIST_MODAL,
+    GLOBAL_DISMISS_ADD_VIDEO_TO_PLAYLIST_MODAL,
+
     GLOBAL_DISPLAY_ADD_VIDEO_MODAL,
     GLOBAL_DISMISS_ADD_VIDEO_MODAL,
     GLOBAL_ADD_VIDEO_MODAL_SET_VIDEO_TITLE,
@@ -41,6 +44,8 @@ import {
 
     GLOBAL_SET_NAVIGATION,
     GLOBAL_SET_MOBILE_DRAWER_IS_OPEN,
+
+    GLOBAL_LOGOUT,
 
     GLOBAL_PLAYLISTS_IS_LOAD,
     GLOBAL_HOME_IS_LOAD,
@@ -112,6 +117,19 @@ export const globalDisplayCreatePlaylistModal = (modalInfo) => {
 export const globalDismissCreatePlaylistModal = () => {
     return {
         type: GLOBAL_DISMISS_CREATE_PLAYLIST_MODAL
+    };
+};
+
+export const globalDisplayAddVideoToPlaylistModal = (modalInfo) => {
+    return {
+        type: GLOBAL_DISPLAY_ADD_VIDEO_TO_PLAYLIST_MODAL,
+        payload: modalInfo
+    };
+};
+
+export const globalDismissAddVideoToPlaylistModal = () => {
+    return {
+        type: GLOBAL_DISMISS_ADD_VIDEO_TO_PLAYLIST_MODAL
     };
 };
 
@@ -259,6 +277,12 @@ export const globalSetMobileDrawerIsOpen = (value) => {
 };
 
 
+
+export const globalLogout = () => {
+    return {
+        type: GLOBAL_LOGOUT
+    };
+};
 
 export const globalHomeIsLoad = () => {
     return {

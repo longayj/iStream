@@ -6,7 +6,8 @@ import { withRouter } from 'react-router-dom';
 import {
     globalDisplayAlertDialog,
     globalDisplayLoadMask,
-    globalDismissLoadMask
+    globalDismissLoadMask,
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -75,6 +76,11 @@ class Video extends React.Component {
 
         let me = this;
 
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
+
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.VIDEOS + "/" + this.props.video.id, params);
         communication.sendRequest(
@@ -119,7 +125,8 @@ class Video extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -332,6 +339,7 @@ export default withRouter(connect(mapStateToProps, {
     globalDisplayAlertDialog,
     globalDisplayLoadMask,
     globalDismissLoadMask,
+    globalReset,
 
     //VIDEO
     videoUnsetVideo,

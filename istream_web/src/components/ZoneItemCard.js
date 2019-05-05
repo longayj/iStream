@@ -28,7 +28,8 @@ import {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayNotificationSnackbar,
-    globalDisplayConfirmDialog
+    globalDisplayConfirmDialog,
+    globalReset
 
 } from "../redux/actions/globalActions";
 
@@ -53,6 +54,11 @@ class ZoneItemCard extends React.Component {
         params[Fields.URL] = props.item.link;
         params[Fields.TITLE] = props.item.title;
         params[Fields.IMAGE_URL] = props.item.imageUrl;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.ZONE, params);
@@ -93,7 +99,8 @@ class ZoneItemCard extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -173,6 +180,7 @@ export default withRouter(connect(mapStateToProps, {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayNotificationSnackbar,
-    globalDisplayConfirmDialog
+    globalDisplayConfirmDialog,
+    globalReset
 
 })(withStyles(styles, { withTheme: true })(ZoneItemCard)));

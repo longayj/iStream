@@ -17,6 +17,8 @@ import {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayAlertDialog,
+
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -47,6 +49,7 @@ import CommunicationApi from "../../utils/CommunicationApi";
 import HttpMethods from "../../constants/HttpMethods";
 import Paths from "../../constants/Paths";
 import Status from "../../constants/Status";
+import {withRouter} from "react-router-dom";
 
 const styles = theme => ({
     root: {
@@ -64,7 +67,7 @@ const styles = theme => ({
     },
     formControl: {
         margin: theme.spacing.unit * 2,
-    },
+    }
 });
 
 class Settings extends React.Component {
@@ -117,6 +120,11 @@ class Settings extends React.Component {
         params[Fields.DARK_MODE] = this.props.settingsProfile.darkMode;
         params[Fields.PRIMARY_COLOR] = this.props.settingsProfile.primaryColor;
         params[Fields.SECONDARY_COLOR] = this.props.settingsProfile.secondaryColor;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.PUT, Paths.HOST + Paths.USER + "/" + this.props.profile.id, params);
@@ -381,7 +389,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
     globalSettingsSetLanguage,
     globalSettingsSetUsername,
     globalSettingsSetEmail,
@@ -397,5 +405,7 @@ export default connect(mapStateToProps, {
     globalDismissLoadMask,
     globalDisplayAlertDialog,
 
+    globalReset,
+
     homeSetVideosStreamPreferences
-})(withStyles(styles)(Settings));
+})(withStyles(styles)(Settings)));

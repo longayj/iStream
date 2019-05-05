@@ -13,8 +13,9 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
-import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import MovieIcon from '@material-ui/icons/Movie';
 import TvIcon from '@material-ui/icons/Tv';
 import ClearIcon from '@material-ui/icons/Clear';
@@ -34,7 +35,11 @@ import {
     globalDismissLoadMask,
     globalDisplayAlertDialog,
 
-    globalSetNavigation
+    globalDisplayAddVideoToPlaylistModal,
+
+    globalSetNavigation,
+
+    globalReset
 } from "../redux/actions/globalActions";
 
 import {
@@ -46,6 +51,7 @@ import {
 } from "../redux/actions/homeActions";
 
 import "../styles/VideoCard.css";
+import {Tooltip} from "@material-ui/core/es/index";
 
 const styles = {
     card: {
@@ -73,6 +79,11 @@ class VideoCard extends React.Component {
     }
 
     deleteVideo(props) {
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.DELETE, Paths.HOST + Paths.VIDEOS + "/" + props.video.id, {});
@@ -113,7 +124,8 @@ class VideoCard extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -139,6 +151,12 @@ class VideoCard extends React.Component {
 
     handleLikeClick() {
 
+    }
+
+    handleAddToAPlayistClick() {
+        this.props.globalDisplayAddVideoToPlaylistModal(
+            this.props.video.title + ", " + this.props.video.castingShort.directors + " (" + this.props.video.productionYear + ")"
+        );
     }
 
     render() {
@@ -198,10 +216,31 @@ class VideoCard extends React.Component {
                     </CardContent>
                 </CardActionArea>
                 <CardActions>
-                    <Button onClick={this.handleLikeClick.bind(this)} color={"primary"} variant={"contained"}>
-                        <FavoriteBorderIcon/>
-                        {Texts.LIKE[this.props.profile.languageString]}
-                    </Button>
+                    <Tooltip
+                        title={Texts.LIKE[this.props.profile.languageString]}
+                        aria-label={Texts.LIKE[this.props.profile.languageString]}
+                    >
+                        <IconButton
+                            onClick={this.handleLikeClick.bind(this)}
+                            color={"secondary"}
+                            variant={"contained"}
+                        >
+                            <FavoriteBorderIcon/>
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip
+                        title={Texts.ADD_TO_A_PLAYLIST[this.props.profile.languageString]}
+                        aria-label={Texts.ADD_TO_A_PLAYLIST[this.props.profile.languageString]}
+                    >
+                        <IconButton
+                            onClick={this.handleAddToAPlayistClick.bind(this)}
+                            color={"secondary"}
+                            variant={"contained"}
+                        >
+                            <PlaylistAddIcon />
+                        </IconButton>
+                    </Tooltip>
                 </CardActions>
             </Card>
         )
@@ -239,7 +278,11 @@ export default withRouter(connect(mapStateToProps, {
     globalDismissLoadMask,
     globalDisplayAlertDialog,
 
+    globalDisplayAddVideoToPlaylistModal,
+
     globalSetNavigation,
+
+    globalReset,
 
     //VIDEO
     videoSetVideo,

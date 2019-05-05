@@ -8,7 +8,9 @@ import {
     globalDismissConfirmDialog,
 
     globalSetNavigation,
-    globalSetMobileDrawerIsOpen
+    globalSetMobileDrawerIsOpen,
+
+    globalReset
 } from "../redux/actions/globalActions";
 
 /* PAGES */
@@ -39,6 +41,7 @@ import PlaylistIcon from '@material-ui/icons/PlaylistPlay';
 import VideoIcon from '@material-ui/icons/VideoLibrary';
 import PlayArrayIcon from '@material-ui/icons/PlayArrow';
 import SettingsIcon from '@material-ui/icons/Settings';
+import LogoutIcon from '@material-ui/icons/ExitToApp';
 import SearchIcon from '@material-ui/icons/Search';
 
 /* CUSTOM COMPONENTS */
@@ -53,6 +56,7 @@ import AlertDialog from "./modals/AlertDialog";
 import ConfirmDialog from "./modals/ConfirmDialog";
 import AddVideoModal from "./modals/AddVideoModal";
 import CreatePlaylistModal from "./modals/CreatePlaylistModal";
+import AddVideoToPlaylistModal from "./modals/AddVideoToPlaylistModal";
 
 import NotificationSnackbar from "./NotificationSnackbar";
 
@@ -65,6 +69,7 @@ import Texts from "../constants/Texts";
 /* STYLES */
 
 import '../styles/App.css';
+import {IconButton, Tooltip} from "@material-ui/core/es/index";
 
 
 class App extends React.Component {
@@ -77,8 +82,6 @@ class App extends React.Component {
             keepPrevRouteSettings: this.props.location.pathname,
             settingsToggleActive: (this.props.location.pathname === "/settings")
         });
-
-        console.log("hahahahaahah ==> ", this.props.location.pathname);
     }
 
     handleSelectChange(route) {
@@ -128,6 +131,11 @@ class App extends React.Component {
                 settingsToggleActive: state
             });
         }
+    }
+
+    handleLogoutClick() {
+        localStorage.removeItem("token");
+        this.props.globalReset();
     }
 
     render() {
@@ -230,6 +238,20 @@ class App extends React.Component {
             </ToggleButton>
         );
 
+        const logoutButton = (
+            <Tooltip
+                title={Texts.LOGOUT[this.props.profile.languageString]}
+                aria-label={Texts.LOGOUT[this.props.profile.languageString]}
+            >
+                <IconButton
+                    aria-label="Logout"
+                    onClick={this.handleLogoutClick.bind(this)}
+                >
+                    <LogoutIcon />
+                </IconButton>
+            </Tooltip>
+        );
+
         return (
             <MuiThemeProvider theme = { theme }>
 
@@ -245,6 +267,7 @@ class App extends React.Component {
                                 <Layout
                                   brand={"iStream"}
                                   appBarRight={appBarButton}
+                                  logoutButton={logoutButton}
                                   navigationMenu={menu}
                                 >
                                     <Route exact path={"/"} component={Home} />
@@ -258,6 +281,7 @@ class App extends React.Component {
 
                                     <AddVideoModal/>
                                     <CreatePlaylistModal/>
+                                    <AddVideoToPlaylistModal/>
 
                                     <LoadMask
                                         show={this.props.showLoadMask}
@@ -335,5 +359,7 @@ export default withRouter(connect(mapStateToProps, {
     globalDismissConfirmDialog,
 
     globalSetNavigation,
-    globalSetMobileDrawerIsOpen
+    globalSetMobileDrawerIsOpen,
+
+    globalReset
 })(App));

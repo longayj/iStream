@@ -14,7 +14,9 @@ import {
     globalAddVideoModalSetSuggestions,
     globalAddVideoModalSetSuggestionsPossible,
     globalAddVideoModalSetCurrentVideo,
-    globalAddVideoModalSetVideoUrl
+    globalAddVideoModalSetVideoUrl,
+
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -43,6 +45,7 @@ import Status from "../../constants/Status";
 import Texts from "../../constants/Texts";
 
 import AutoCompleteField from "../AutoCompleteField";
+import {withRouter} from "react-router-dom";
 
 class AddVideoModal extends React.Component {
 
@@ -85,6 +88,11 @@ class AddVideoModal extends React.Component {
         params[Fields.CODE] = this.props.addVideoModalCurrentVideoCode;
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.VIDEOS, params);
@@ -133,7 +141,8 @@ class AddVideoModal extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -143,6 +152,11 @@ class AddVideoModal extends React.Component {
         params[Fields.Q] = value;
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         me.props.globalAddVideoModalSetSuggestionsPossible(false);
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.SEARCH, params);
@@ -242,10 +256,8 @@ class AddVideoModal extends React.Component {
                     maxWidth={"sm"}
                     fullWidth={true}
                     onClose={this.handleClose.bind(this)}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">
+                    <DialogTitle>
                         {
                             Texts.ADD_A_VIDEO[this.props.profile.languageString]
                         }
@@ -367,7 +379,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
     //GLOBAL
     globalDisplayLoadMask,
     globalDismissLoadMask,
@@ -383,6 +395,8 @@ export default connect(mapStateToProps, {
     globalAddVideoModalSetCurrentVideo,
     globalAddVideoModalSetVideoUrl,
 
+    globalReset,
+
     //HOME
     homeAddVideo
-})(AddVideoModal);
+})(AddVideoModal));
