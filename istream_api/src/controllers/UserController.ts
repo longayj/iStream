@@ -242,6 +242,7 @@ createConnection(/*...*/).then(async connection => {
                 videoRes.total_page = 1
             else
                 videoRes.total_page = Math.ceil(count / per_page)
+            videoRes.total_videos = count
             videoRes.videos = videos
             res.send(videoRes)
         }).catch(err => {
@@ -363,7 +364,10 @@ createConnection(/*...*/).then(async connection => {
     router.put("/:id/playlists/:idPlaylist", [checkJwt],  (req: Request, res: Response) => {
         let shared = req.body.shared || 0
         let name = req.body.name || undefined
-
+        if (req.body.shared == "true")
+            shared = 1
+        else if (req.body.shared == "false")
+            shared = 0
         if (req.body.shared == "true")
             shared = 1
         else if (req.body.shared == "false")

@@ -72,7 +72,16 @@ createConnection()
     video.filename = "Filename of the BestMovie"
     video.productionYear = 1900
     await connection.manager.save(video)
-
+    video = new Video();
+    video.id = 2;
+    video.title = "The Best Movie 2"
+    video.url = "http://....."
+    video.synopsis = "The Storie of best movie 2"
+    video.description = "The Best description 2"
+    video.filename = "Filename of the BestMovie 2"
+    video.productionYear = 1903
+    await connection.manager.save(video)
+    
     // AllDebridApi.getToken()
     // .then(result => {
     //     if (result.data.success == false)

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 
 import {Video, Statistics, CastingShort, Streaming} from '../entity'
-import { createConnection } from 'typeorm';
+import { createConnection, Like } from 'typeorm';
 import { AlloCineApi, AllDebridApi } from '../Utils';
 import Axios from '../../node_modules/axios';
 import { checkJwt } from "../middlewares/checkJwt";
@@ -15,13 +15,57 @@ createConnection(/*...*/).then(async connection => {
     
 // route get /videos
 router.get('/', (req: Request, res: Response) => {
-    connection.getRepository(Video).find({relations: ["statistics", "streaming", "castingShort"]})
+    let page = req.query.page || 0
+    let per_page = req.query.per_page || 10
+    // limit superieur du nombre par page
+    if (per_page > 100)
+        per_page = 100
+    // limit inferieur du nombre par page
+    if (per_page <= 0)
+        per_page = 1
+    // limit inferieur des page
+    if (page <= 0)
+        page = 1
+    // les page commence a 0 donc -- 
+    --page
+
+    let mywhere:any = {
+    }
+    let q = req.query.q || undefined
+    if (q != undefined) {
+        mywhere = [
+            {originalTitle: Like("%" + q + "%")},
+            {title: Like("%" + q + "%")},
+            {description: Like("%" + q + "%")},
+            {actors: Like("%" + q + "%")},
+            {directors: Like("%" + q + "%")}
+        ]
+        console.log("mywhere set !")
+    }
+    connection.getRepository(Video)
+    .findAndCount({
+        relations: ["statistics", "streaming", "castingShort"],
+        where: mywhere,
+        skip: page * per_page,
+        take: per_page
+    })
     .then(videos => {
-        if (videos == undefined || videos == null) {
+        //console.log(videos)
+        if (videos[0] == undefined || videos[0] == null) {
             res.status(404).send("No videos sorry :(");
             return;
         }
-       res.send(videos);
+        let videoRes:any = new Object
+        videoRes.per_page = per_page
+        videoRes.page = page + 1
+        let count = videos[1]
+        if (count / per_page < 1)
+            videoRes.total_page = 1
+        else
+            videoRes.total_page = Math.ceil(count / per_page)
+        videoRes.total_videos = count
+        videoRes.videos = videos
+        res.send(videoRes);
     }).catch(err => {
         console.log(err);
         res.send("Error to find videos");
@@ -76,7 +120,8 @@ router.post('/', (req: Request, res: Response) => {
                 newVideo.posterUrl = movie.poster.href;
             if (movie.release != undefined && movie.release.releaseDate != undefined)
                 newVideo.releaseDate = new Date(movie.release.releaseDate);
-     
+            newVideo.actors = movie.castingShort.actors
+            newVideo.directors = movie.castingShort.directors
             // si casting short create !!
             if (movie.castingShort != undefined) {
                 let castingShort = new CastingShort

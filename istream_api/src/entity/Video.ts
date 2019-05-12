@@ -45,6 +45,12 @@ export class Video {
     @Column()
     synopsis: string = "";
 
+    @Column({nullable: true})
+    directors:string;
+
+    @Column({nullable: true})
+    actors:string;
+
     @OneToOne(type => Streaming, { onDelete: 'CASCADE' })
     @JoinColumn()
     streaming: Streaming;
