@@ -41,7 +41,7 @@ router.get('/', (req: Request, res: Response) => {
             {actors: like("%" + q + "%")},
             {directors: like("%" + q + "%")}
         ]
-        console.log("mywhere set !")
+        //console.log("mywhere set !")
     }
     connection.getRepository(Video)
     .findAndCount({
@@ -66,7 +66,7 @@ router.get('/', (req: Request, res: Response) => {
         else
             videoRes.total_page = Math.ceil(count / per_page)
         videoRes.total_videos = count
-        for (let i = 0; i < testvideos.length; i++) {
+        for (let i = 0; i < testvideos[0].length; i++) {
             testvideos[0][i].total_likes = testvideos[0][i].likes.length
         }
         videoRes.videos = testvideos[0]
