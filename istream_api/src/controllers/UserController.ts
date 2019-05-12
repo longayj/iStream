@@ -613,7 +613,7 @@ createConnection(/*...*/).then(async connection => {
                 }
             }
 
-            connection.getRepository(Playlist).findOne(1, {
+            connection.getRepository(Playlist).findOne({
                 where:myWhere,
                 relations:["videos"]
             }).then(async playlist => {
