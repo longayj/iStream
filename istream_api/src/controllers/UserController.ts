@@ -368,12 +368,10 @@ createConnection(/*...*/).then(async connection => {
             shared = 1
         else if (req.body.shared == "false")
             shared = 0
-        if (req.body.shared == "true")
-            shared = 1
-        else if (req.body.shared == "false")
-            shared = 0
             
-        if (isNaN(Number.parseInt(shared)) || isNaN(Number.parseInt(req.params.idPlaylist)) || isNaN(Number.parseInt(req.params.id)))
+        if (isNaN(Number.parseInt(shared)) 
+        || isNaN(Number.parseInt(req.params.idPlaylist)) 
+        || isNaN(Number.parseInt(req.params.id)))
             return res.status(400).send("Bad request")
 
         if (!name)
