@@ -373,11 +373,11 @@ createConnection(/*...*/).then(async connection => {
         else if (req.body.shared == "false")
             shared = 0
             
-        if (isNaN(Number.parseInt(shared)) || isNaN(req.params.idPlaylist) || isNaN(req.params.id))
+        if (isNaN(Number.parseInt(shared)) || isNaN(Number.parseInt(req.params.idPlaylist)) || isNaN(Number.parseInt(req.params.id)))
             return res.status(400).send("Bad request")
 
         if (!name)
-            return res.status(400).send("Bad request")
+            return res.status(400).send("Bad request, missing name in body")
         if (res.locals.jwtPayload.userId != req.params.id)
             return res.status(401).send("It's not your playlist !");
         connection.getRepository(User).findOne({ 

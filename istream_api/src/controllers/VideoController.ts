@@ -325,7 +325,7 @@ router.get('/:id', (req: Request, res: Response) => {
     let id = req.params.id;
 
     connection.getRepository(Video)
-    .findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort"]})
+    .findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort", "likes"]})
     .then(video => {
         console.log(video)
         if (video == undefined || video == null) {
@@ -405,6 +405,22 @@ router.get('/:id', (req: Request, res: Response) => {
     })
 
 });
+
+router.post('/:id/likes', (req: Request, res: Response) => {
+    if (isNaN(Number.parseInt(req.params.id))) {
+        return res.status(400).send({
+            message: "Bad request"
+        })
+    }
+    
+    connection.getRepository(Video)
+    .findOne({where: {id: req.param.id}, relations: ["statistics", "streaming", "castingShort", "likes"]})
+    .then(video => {
+        
+    }).catch(err => {
+
+    })
+})
 
 /**
  * Delete one movie by id
