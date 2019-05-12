@@ -427,7 +427,9 @@ createConnection(/*...*/).then(async connection => {
 
     // add video in playlist
     router.post("/:id/playlists/:idPlaylist/videos/:idVideo", [checkJwt],  (req: Request, res: Response) => {
-        if (isNaN(req.params.idPlaylist) || isNaN(req.params.id) || isNaN(req.params.idVideo))
+        if (isNaN(Number.parseInt(req.params.idPlaylist)) 
+        || isNaN(Number.parseInt(req.params.id)) 
+        || isNaN(Number.parseInt(req.params.idVideo)))
             return res.status(400).send("Bad request")
         if (res.locals.jwtPayload.userId != req.params.id)
             return res.status(401).send("It's not your token");
@@ -442,8 +444,9 @@ createConnection(/*...*/).then(async connection => {
                 res.status(404).send({message: "Id not found"});
                 return;
             }
-            connection.getRepository(Playlist).findOne(1, {
-                where:{
+            console.log("try to get playlist id : ", req.params.idPlaylist, " owner : " + req.params.id)
+            connection.getRepository(Playlist).findOne({
+                where: {
                     id: req.params.idPlaylist,
                     ownerId: req.params.id
                 },
@@ -496,7 +499,73 @@ createConnection(/*...*/).then(async connection => {
 
     // remove video in playlist
     router.delete("/:id/playlists/:idPlaylist/videos/:idVideo", [checkJwt],  (req: Request, res: Response) => {
+       connection.getRepository(User).findOne({ 
+            select: ["id"],
+            where: {
+                id: req.params.id
+            }
+        }).then(async user => {
+            if (user == undefined || user == null) {
+                res.status(404).send({message: "Id not found"});
+                return;
+            }
+            connection.getRepository(Playlist).findOne({
+                where: {
+                    id: req.params.idPlaylist,
+                    ownerId: req.params.id
+                },
+                relations:["videos"] 
+            }).then(playlist => {
+                if (playlist == undefined || playlist == null) {
+                    res.status(404).send({message: "Playlist id not found"});
+                    return;
+                }
+                connection.getRepository(Video).findOne({
+                    where: {
+                        id: req.params.idVideo
+                    }
+                }).then(video =>{
+                    console.log("playlist !!  : ", playlist)
+                    if (video == undefined || video == null) {
+                        res.status(404).send({message: "Video id not found"});
+                        return;
+                    }
+                    let inPlaylist = false
+                    for (let i = 0; i < playlist.videos.length; i++) {
+                        //console.log("check video : ", playlist.videos[0].id, " video id :", video.id)
+                        if (playlist.videos[i].id == video.id) {
+                            // supprimer 
+                            inPlaylist = true
+                            playlist.videos.splice(playlist.videos.indexOf(playlist.videos[i]), 1)
+                            connection.manager.save(playlist)
+                            .then(playlist => {
+                                console.log(playlist)
+                                res.status(200).send({
+                                    message: "delete successfull"
+                                });
+                            }).catch(err => {
+                                console.log(err)
+                                res.status(500).send({message: "Fail to save video in playlists"});
+                            })
+                        }
+                    }
+                    if (!inPlaylist) {
+                        return res.status(404).send({message: "Videos not in playlist"})
+                    }
+                }).catch(err => {
+                    console.log(err)
+                    res.status(500).send('Fail to get video')
+                })
 
+            }).catch(err => {
+                console.log(err)
+                res.status(500).send('Fail to get playlist')
+            })
+
+        }).catch(err => {
+            console.log(err)
+            res.status(500).send()
+        })
     })
 
     // get video in playlist
