@@ -51,6 +51,7 @@ router.get('/', (req: Request, res: Response) => {
         take: per_page
     })
     .then(videos => {
+        let testvideos: [any[], Number] = videos
         //console.log(videos)
         if (videos[0] == undefined || videos[0] == null) {
             res.status(404).send("No videos sorry :(");
@@ -65,7 +66,10 @@ router.get('/', (req: Request, res: Response) => {
         else
             videoRes.total_page = Math.ceil(count / per_page)
         videoRes.total_videos = count
-        videoRes.videos = videos[0]
+        for (let i = 0; i < testvideos.length; i++) {
+            testvideos[0][i].total_likes = testvideos[0][i].likes.length
+        }
+        videoRes.videos = testvideos[0]
         res.send(videoRes);
     }).catch(err => {
         console.log(err);
@@ -385,8 +389,10 @@ router.get('/:id', (req: Request, res: Response) => {
         */
         // fin du refresh a chaque get /video/:id
 
-        // pour juste return la video 
-        res.status(200).send(video);
+        // pour juste return la video
+        let testVideo:any = video
+        testVideo.total_likes = video.likes.length 
+        res.status(200).send(testVideo);
 
         // fin du return juste video 
 
@@ -433,7 +439,9 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
                     alreadyAdd = true;
             })
             if (alreadyAdd) {
-                res.status(403).send("Picture " + video.id + " already like by " + req.params.id)
+                res.status(403).send({
+                    message : "Picture " + video.id + " already like by " + req.params.id
+                })
             }  else {
                 let newLike = new MyLike;
                 newLike.userId = jwttoken.userId;
@@ -455,8 +463,74 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
         }
     }).catch(err => {
         console.log(err)
-        return res.status(500).send("Fail to get videos")
+        return res.status(500).send({
+            message: "Fail to get videos"
+        })
     })
+})
+
+router.delete('/:id/likes/:idLike', [checkJwt], (req: Request, res: Response) => {
+    let jwttoken = res.locals.jwtPayload
+    console.log("User ", jwttoken.userId, " try to delete like on video id ", req.params.id)
+    if (isNaN(Number.parseInt(req.params.id))
+        || isNaN(Number.parseInt(req.params.idLike))) {
+        return res.status(400).send({
+            message: "Bad request"
+        })
+    }
+    connection.getRepository(Video).findOne({
+        where:{
+            id: req.params.id
+        },
+        relations:["likes"]
+    }).then(video => {
+        if (video == undefined || video == null)
+            return res.status(404).send({
+                message: "video id not found"
+            })
+        for (let i = 0; i < video.likes.length; i++) {
+            if (video.likes[i].userId == jwttoken.userId)
+            {
+                // il a bien like la video 
+                // essai de suppression
+                connection.getRepository(MyLike).findOne({
+                    where: {
+                        id: req.params.idLike
+                    }
+                }).then(like => {
+                    if (like == undefined || like == null)
+                        return res.status(404).send({
+                            message: "id like not found"
+                        })
+                    connection.getRepository(MyLike).remove(like)
+                    .then(like => {
+                        console.log("like delete ", like)
+                        return res.send({
+                            message: 'like delete'
+                        })
+                    }).catch(err => {
+                        console.log(err)
+                        return res.status(500).send({
+                            message: 'fail to delete like'
+                        })
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    return res.status(500).send({
+                        message: "fail to get like"
+                    })
+                })
+            }
+        }
+        if (video.likes.length == 0)
+            return res.status(404).send({
+                message: "id like not found"
+            })
+    }).catch(err => {
+        console.log(err)
+        return res.status(500).send("fail to get video")
+    })
+    
 })
 
 /**
