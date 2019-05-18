@@ -81,6 +81,7 @@ const initialState = {
 
     showAddVideoToPlaylistModal: false,
     addVideoToPlaylistModalVideoTitle: "",
+    addVideoToPlaylistModalVideoId: -1,
 
     showAddVideoModal: false,
     addVideoModalVideoTitle: "",
@@ -211,13 +212,15 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 showAddVideoToPlaylistModal: true,
-                addVideoToPlaylistModalVideoTitle: action.payload
+                addVideoToPlaylistModalVideoTitle: action.payload.title,
+                addVideoToPlaylistModalVideoId: action.payload.id
             };
         case GLOBAL_DISMISS_ADD_VIDEO_TO_PLAYLIST_MODAL:
             return {
                 ...state,
                 showAddVideoToPlaylistModal: false,
-                addVideoToPlaylistModalVideoTitle: initialState.addVideoToPlaylistModalVideoTitle
+                addVideoToPlaylistModalVideoTitle: initialState.addVideoToPlaylistModalVideoTitle,
+                addVideoToPlaylistModalVideoId: initialState.addVideoToPlaylistModalVideoId
             };
 
         case GLOBAL_DISPLAY_ADD_VIDEO_MODAL:

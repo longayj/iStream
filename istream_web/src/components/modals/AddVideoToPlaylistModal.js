@@ -21,6 +21,9 @@ import {
 } from "../../redux/actions/playlistsActions";
 
 import PlaylistIcon from '@material-ui/icons/PlaylistPlay';
+import PrevIcon from '@material-ui/icons/SkipPrevious';
+import NextIcon from '@material-ui/icons/SkipNext';
+
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -41,7 +44,10 @@ import Paths from "../../constants/Paths";
 import Fields from "../../constants/Fields";
 import Status from "../../constants/Status";
 import Texts from "../../constants/Texts";
-import {Checkbox, FormControlLabel, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core/es/index";
+import {
+    Checkbox, FormControlLabel, List, ListItem, ListItemIcon, ListItemText,
+    Typography
+} from "@material-ui/core/es/index";
 import Playlist from "../../models/Playlist";
 import {withRouter} from "react-router-dom";
 
@@ -50,18 +56,26 @@ class AddVideoToPlaylistModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            checked_playlist: -1
+            checked_playlist: -1,
+
+            page: 1,
+            per_page: 10,
+            total_page: 1
         };
     }
 
     componentDidMount() {
-        if (this.props.playlistsIsLoad === false) {
+        /*if (this.props.playlistsIsLoad === false) {
             this.getMyPlaylists();
-        }
+        }*/
+        this.getMyPlaylists(this.state.page);
     }
 
-    getMyPlaylists() {
+    getMyPlaylists(page) {
         let params = {};
+
+        params[Fields.PER_PAGE] = this.state.per_page;
+        params[Fields.PAGE] = page;
 
         let me = this;
 
@@ -83,6 +97,10 @@ class AddVideoToPlaylistModal extends React.Component {
 
                     response.data.playlists.forEach(function (item) {
                         playlists.push(new Playlist(item));
+                    });
+
+                    me.setState({
+                        total_page: response.data.total_page
                     });
 
                     me.props.playlistsSetPlaylists(playlists);
@@ -131,13 +149,13 @@ class AddVideoToPlaylistModal extends React.Component {
     };
 
     handleAdd() {
-
+        if (this.state.checked_playlist != -1) {
+            this.addVideoToPlaylist();
+        }
     }
 
     addVideoToPlaylist() {
         let params = {};
-
-        params[Fields.NAME] = "";
 
         let me = this;
 
@@ -147,7 +165,9 @@ class AddVideoToPlaylistModal extends React.Component {
         }
 
         this.props.globalDisplayLoadMask();
-        let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.USER + "/" + this.props.profile.id + Paths.PLAYLISTS, params);
+        let communication = new CommunicationApi(
+            HttpMethods.POST, Paths.HOST + Paths.USER + "/" + this.props.profile.id +
+            Paths.PLAYLISTS + "/" + this.state.checked_playlist + Paths.VIDEOS + "/" + this.props.addVideoToPlaylistModalVideoId, params);
         communication.sendRequest(
             function (response) {
 
@@ -155,11 +175,11 @@ class AddVideoToPlaylistModal extends React.Component {
 
                 if (response.status === 200) {
 
-                    me.props.playlistsAddPlaylist(
-                        new Playlist(response.data)
-                    );
+                    me.props.globalDisplayNotificationSnackbar(Texts.VIDEO_ADDED_TO_PLAYLIST[me.props.profile.languageString]);
 
-                    me.props.globalDisplayNotificationSnackbar(Texts.PLAYLIST_CREATED[me.props.profile.languageString]);
+                    me.setState({
+                        checked_playlist: -1
+                    });
 
                     me.props.globalDismissAddVideoToPlaylistModal();
 
@@ -200,6 +220,24 @@ class AddVideoToPlaylistModal extends React.Component {
         this.setState({
             checked_playlist: item.id
         })
+    }
+
+    handlePrevPageClick() {
+        let new_page = this.state.page - 1;
+        this.setState({
+            page: new_page,
+            checked_playlist: -1
+        });
+        this.getMyPlaylists(new_page);
+    }
+
+    handleNextPageClick() {
+        let new_page = this.state.page + 1;
+        this.setState({
+            page: new_page,
+            checked_playlist: -1
+        });
+        this.getMyPlaylists(new_page);
     }
 
     render() {
@@ -247,6 +285,41 @@ class AddVideoToPlaylistModal extends React.Component {
                                     </ListItem>
                                 ))
                             }
+                            {
+                                this.props.playlistsIsLoad == true &&
+
+                                <Grid container justify="center">
+                                    {
+                                        this.state.page > 1 &&
+
+                                        <Button
+                                            color={"primary"}
+                                            variant={"contained"}
+                                            onClick={this.handlePrevPageClick.bind(this)}
+                                        >
+                                            <PrevIcon />&nbsp;
+                                            {Texts.PREVIOUS_PAGE[this.props.profile.languageString]}
+                                        </Button>
+                                    }
+                                    &nbsp;
+                                    <Typography style={{textAlign: "center"}} variant="h6">
+                                        {Texts.PAGE[this.props.profile.languageString] + " " + this.state.page + " / " + this.state.total_page}
+                                    </Typography>
+                                    &nbsp;
+                                    {
+                                        this.state.page < this.state.total_page &&
+
+                                        <Button
+                                            color={"primary"}
+                                            variant={"contained"}
+                                            onClick={this.handleNextPageClick.bind(this)}
+                                        >
+                                            <NextIcon />&nbsp;
+                                            {Texts.NEXT_PAGE[this.props.profile.languageString]}
+                                        </Button>
+                                    }
+                                </Grid>
+                            }
                         </List>
                     </DialogContent>
                     <DialogActions>
@@ -271,6 +344,7 @@ function mapStateToProps(state) {
     return {
         showAddVideoToPlaylistModal: state.global.showAddVideoToPlaylistModal,
         addVideoToPlaylistModalVideoTitle: state.global.addVideoToPlaylistModalVideoTitle,
+        addVideoToPlaylistModalVideoId: state.global.addVideoToPlaylistModalVideoId,
 
         profile: state.global.profile,
         playlistsIsLoad: state.global.playlistsIsLoad,

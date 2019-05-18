@@ -75,7 +75,7 @@ class CreatePlaylistModal extends React.Component {
         let params = {};
 
         params[Fields.NAME] = this.state.name;
-        params[Fields.SHARED] = this.state.shared;
+        params[Fields.SHARED] = this.state.shared ? 1 : 0;
 
         let me = this;
 

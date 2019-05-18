@@ -19,7 +19,9 @@ const Paths = {
 
     USER: '/users',
 
-    PLAYLISTS: "/playlists"
+    PLAYLISTS: "/playlists",
+
+    LIKES: "/likes"
 
 };
 
