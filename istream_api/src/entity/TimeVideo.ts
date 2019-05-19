@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, OneToMany, ManyToOne, JoinTable} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, OneToMany, ManyToOne, JoinTable, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import {Video} from './Video'
 import { User } from "./User";
 
@@ -8,18 +8,30 @@ export class TimeVideo {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: true})
     ended:boolean;
     
-    @Column()
+    @Column({nullable: true})
     duration: number
 
-    @Column()
+    @Column({nullable: true})
     currentTime: number
 
     @ManyToOne(type => User, user => user.viewing)
     owner: User;
 
-    @ManyToOne(type => Video, video => video.playlists)
+    @Column({nullable: true})
+    ownerId: number
+
+    @ManyToOne(type => Video, video => video.viewing)
     videos: Video;
+
+    @Column({nullable: true})
+    videosId: number
+
+    @CreateDateColumn({nullable: true})
+    createdAt: Date;
+
+    @UpdateDateColumn({nullable: true})
+    updatedAt: Date;
 }

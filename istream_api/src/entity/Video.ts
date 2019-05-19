@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn, ManyToMany, ManyToOne} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn, ManyToMany, ManyToOne, UpdateDateColumn, CreateDateColumn} from "typeorm";
 import {Tag} from './Tag'
 import {Comment} from './Comment'
 import {Like} from './Like'
@@ -80,4 +80,10 @@ export class Video {
 
     @OneToMany(type => Comment, comment => comment.video)
     comments: Comment[];
+
+    @CreateDateColumn({nullable: true})
+    createdAt: Date;
+
+    @UpdateDateColumn({nullable: true})
+    updatedAt: Date;
 }

@@ -4,6 +4,7 @@ import {User} from '../entity/User'
 import { checkJwt } from "../middlewares/checkJwt";
 import { Video } from '../entity';
 import { Playlist } from '../entity/Playlist';
+import { TimeVideo } from '../entity/TimeVideo';
 
 const router: Router = Router();
 
@@ -249,7 +250,6 @@ createConnection(/*...*/).then(async connection => {
             console.log(err)
             res.status(500).send({message: "Error to find Users"})
         })
-
     })
 
     router.get("/:id/playlists", [checkJwt],  (req: Request, res: Response) => {
@@ -421,6 +421,178 @@ createConnection(/*...*/).then(async connection => {
 
 
 
+    })
+
+    // get current viewing video sort by updated At
+    router.get("/:id/viewing", [checkJwt],  (req: Request, res: Response) => {
+        let page = req.query.page || 0
+        let per_page = req.query.per_page || 10
+        // limit superieur du nombre par page
+        if (per_page > 100)
+            per_page = 100
+        // limit inferieur du nombre par page
+        if (per_page <= 0)
+            per_page = 1
+        // limit inferieur des page
+        if (page <= 0)
+            page = 1
+        // les page commence a 0 donc -- 
+        --page
+        // check user id
+        if (res.locals.jwtPayload.userId != req.params.id)
+            return res.status(401).send("It's not your token !");
+        connection.getRepository(User).findOne({ 
+            select: ["id"],
+            where: {
+                id: req.params.id
+            }
+        }).then(async user => {
+            if (user == undefined || user == null) {
+                res.status(404).send({message: "Id not found"});
+                return;
+            }
+            console.log("good user")
+            connection.getRepository(TimeVideo)
+            .find({
+                where: {
+                    ownerId: res.locals.jwtPayload.userId
+                },
+                order: {
+                    updatedAt: "DESC"
+                },
+                skip: per_page * page,
+                take: per_page
+            }).then(async viewing => {
+                console.log("viewing info : ", viewing)
+                let viewingRes:any = new Object
+                let timeVideo = new Object
+                let count = await connection.getRepository(TimeVideo)
+                .findAndCount({
+                    where: {
+                        ownerId : req.params.id
+                    }
+                })[1]
+                if (count == undefined)
+                    count = 0
+                console.log(count)
+                viewingRes.per_page = per_page
+                viewingRes.page = page + 1
+                if (count / per_page < 1)
+                    viewingRes.total_page = 1
+                else
+                    viewingRes.total_page = Math.ceil(count / per_page)
+                timeVideo = viewing
+                for (let i = 0; i < viewing.length; i++) {
+                    timeVideo[i].video = await connection.getRepository(Video).findOne({where: {
+                        id : timeVideo[i].videoId
+                    }})
+                }
+                viewingRes.viewing = viewing
+                return res.send(viewingRes)
+                // modifier et retourner les video et pas juste les objet viewing
+            }).catch(err => {
+                console.log(err)
+                return res.status(500).send('Fail to get TimeVideo')
+            })
+        }).catch(err => {
+            console.log(err)
+            res.status(500).send('Fail to get User')
+        })
+    })
+
+    // add viewing video
+    router.post("/:id/viewing/:idVideo", [checkJwt],  (req: Request, res: Response) => {
+        let currentTime = req.body.currentTime || 0
+        let duration = req.body.duration || 0
+        if (isNaN(Number.parseInt(req.params.idVideo)) ||
+            isNaN(Number.parseInt(req.params.id)))
+            return res.status(400).send({
+                message: "bad request"
+            })
+        if (res.locals.jwtPayload.userId != req.params.id)
+            return res.status(401).send("It's not your token !");
+        connection.getRepository(User).findOne({ 
+            select: ["id"],
+            where: {
+                id: req.params.id
+            }
+        }).then(async user => {
+            if (user == undefined || user == null) {
+                return res.status(404).send({message: "Id not found"});;
+            }
+            // check video id
+            let video = await connection.getRepository(Video)
+            .findOne({
+                where: {
+                    id: req.params.idVideo
+                }
+            })
+            if (video == undefined || video == null)
+                return res.status(404).send({
+                    message: 'Id Video not found'
+                })
+
+            connection.getRepository(TimeVideo).findOne({ 
+                where: {
+                    ownerId: req.params.id,
+                    videosId: req.params.idVideo
+                }
+            }).then(async viewing => {
+                if (viewing != undefined && viewing != null)
+                {
+                    console.log('update video ', req.params.idVideo)
+                    viewing.currentTime = currentTime
+                    viewing.duration = duration
+                    connection.manager.save(viewing)
+                    .then(viewing => {
+                        let result:any = new Object
+                        result = viewing
+                        result.video = video
+                        console.log('timeVideo update ', viewing)
+                        return res.send(result)
+                    }).catch(err => {
+                        console.log(err)
+                        return res.status(500).send({
+                            message: 'fail to edit timeVideo'
+                        })
+                    })
+                    return
+                }
+                console.log("User ", res.locals.jwtPayload.userId, " add video in viewing list, videoId : ", req.params.idVideo)
+                let timeVideo = new TimeVideo;
+                timeVideo.currentTime = currentTime
+                timeVideo.duration = duration
+                timeVideo.videosId = req.params.idVideo
+                timeVideo.ownerId = req.params.id
+                // save new time video
+                connection.manager.save(timeVideo)
+                .then(timeVideo => {
+                    console.log("new timevideo ", timeVideo)
+                    let result:any = new Object
+                    result = timeVideo
+                    result.video = video
+                    return res.send(result)
+                }).catch(err => {
+                    console.log(err)
+                    return res.status(500).send({
+                        message: "fail to save timeVideo"
+                    })
+                })
+            }).catch(err => {
+                console.log(err)
+                return res.status(500).send('Fail to get TimeVideo')
+            })
+
+        }).catch(err => {
+            console.log(err)
+            res.status(500).send('Fail to get User')
+        })
+    })
+
+    // update viewing video
+    router.put("/:id/viewing/:idVideo", [checkJwt],  (req: Request, res: Response) => {
+        let currentTime = req.body.currentTime || 0
+        let duration = req.body.duration || 0
     })
 
     // add video in playlist
