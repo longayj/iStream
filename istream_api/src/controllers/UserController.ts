@@ -466,12 +466,13 @@ createConnection(/*...*/).then(async connection => {
                 console.log("viewing info : ", viewing)
                 let viewingRes:any = new Object
                 let timeVideo = new Object
-                let count = await connection.getRepository(TimeVideo)
+                let result = await connection.getRepository(TimeVideo)
                 .findAndCount({
                     where: {
                         ownerId : req.params.id
                     }
-                })[1]
+                })
+                let count = result[1]
                 if (count == undefined)
                     count = 0
                 console.log(count)
@@ -535,7 +536,7 @@ createConnection(/*...*/).then(async connection => {
             connection.getRepository(TimeVideo).findOne({ 
                 where: {
                     ownerId: req.params.id,
-                    videosId: req.params.idVideo
+                    videoId: req.params.idVideo
                 }
             }).then(async viewing => {
                 if (viewing != undefined && viewing != null)
@@ -562,7 +563,7 @@ createConnection(/*...*/).then(async connection => {
                 let timeVideo = new TimeVideo;
                 timeVideo.currentTime = currentTime
                 timeVideo.duration = duration
-                timeVideo.videosId = req.params.idVideo
+                timeVideo.videoId = req.params.idVideo
                 timeVideo.ownerId = req.params.id
                 // save new time video
                 connection.manager.save(timeVideo)

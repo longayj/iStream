@@ -24,10 +24,10 @@ export class TimeVideo {
     ownerId: number
 
     @ManyToOne(type => Video, video => video.viewing)
-    videos: Video;
+    video: Video;
 
     @Column({nullable: true})
-    videosId: number
+    videoId: number
 
     @CreateDateColumn({nullable: true})
     createdAt: Date;
