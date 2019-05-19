@@ -65,7 +65,7 @@ export class Video {
     @ManyToMany(type => Playlist, playlist => playlist.videos)
     playlists: Playlist[]
 
-    @OneToMany(type => TimeVideo, timevideo => timevideo.videos)
+    @OneToMany(type => TimeVideo, timevideo => timevideo.video)
     viewing: TimeVideo[]
 
     @OneToOne(type => Statistics, { onDelete: 'CASCADE' })

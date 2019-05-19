@@ -590,6 +590,36 @@ createConnection(/*...*/).then(async connection => {
         })
     })
 
+    router.get("/:id/viewing/:idVideo", [checkJwt],  (req: Request, res: Response) => {
+        if (isNaN(Number.parseInt(req.params.id)) || isNaN(Number.parseInt(req.params.idVideo)))
+            return res.status(400).send({
+                message: 'bad request'
+            })
+        if (res.locals.jwtPayload.userId != req.params.id)
+            return res.status(401).send("It's not your token !");
+        connection.getRepository(TimeVideo).findOne({
+            where: {
+                videoId: req.params.idVideo,
+                ownerId: req.params.id
+            }
+        }).then(viewing => {
+            console.log("get Viewing list ", viewing)
+            if (viewing == undefined)
+                {
+                    let result = new TimeVideo
+                    result.currentTime = 0
+                    result.duration = 0
+                    return res.send(result)
+                }
+            return res.send(viewing)
+        }).catch(err => {
+            console.log(err)
+            return res.status(500).send({
+                message: 'fail to get timeVideo'
+            })
+        })
+    })
+
     // update viewing video
     router.put("/:id/viewing/:idVideo", [checkJwt],  (req: Request, res: Response) => {
         let currentTime = req.body.currentTime || 0
