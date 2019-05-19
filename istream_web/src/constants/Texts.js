@@ -93,6 +93,10 @@ const Texts = {
         fr: "Voulez vous vraiment supprimer cette vidéo ?",
         en: "Do you really want to delete this video ?"
     },
+    DO_REALLY_WANT_TO_REMOVE_THIS_VIDEO_FROM_THIS_PLAYLIST: {
+        fr: "Voulez vous vraiment retirer cette vidéo de cette liste de lecture ?",
+        en: "Do you really want to remove this video from this playlist?"
+    },
     DOWNLOAD: {
         fr: "Télécharger",
         en: "Download"
@@ -203,6 +207,14 @@ const Texts = {
         fr: "Erreur réseau",
         en: "Network error"
     },
+    NEXT_PAGE: {
+        fr: "Page suivante",
+        en: "Next page"
+    },
+    NO_VIDEO_TO_DISPLAY: {
+        fr: "Aucune vidéo à afficher ...",
+        en: "No video to display..."
+    },
 
 
     /* O */
@@ -221,6 +233,10 @@ const Texts = {
     /* P */
 
 
+    PAGE: {
+        fr: "Page",
+        en: "Page"
+    },
     PASSWORD: {
         fr: "Mot de passe",
         en: "Password"
@@ -269,6 +285,10 @@ const Texts = {
         fr: "Note de la presse",
         en: "Press rating"
     },
+    PREVIOUS_PAGE: {
+        fr: "Page précédente",
+        en: "Previous page"
+    },
     PRINCIPAL_COLOR: {
         fr: "Couleur principale",
         en: "Principal color"
@@ -297,6 +317,10 @@ const Texts = {
     REGISTRATION: {
         fr: "Inscription",
         en: "Registration"
+    },
+    REMOVE_A_VIDEO_FROM_THIS_PLAYLIST: {
+        fr: "Retirer une vidéo de cette liste de lecture",
+        en: "Remove a video from this playlist"
     },
     RESET: {
         fr: "Réinitialiser",
@@ -413,6 +437,22 @@ const Texts = {
     VIDEO_ADDED: {
         fr: "Vidéo ajoutée !",
         en: "Video added !"
+    },
+    VIDEO_ADDED_TO_PLAYLIST: {
+        fr: "Vidéo ajoutée à la liste de lecture !",
+        en: "Video added to the playlist!"
+    },
+    VIDEO_LIKED: {
+        fr: "Vous aimez la vidéo !",
+        en: "You liked this video!"
+    },
+    VIDEO_DISLIKED: {
+        fr: "Vous n'aimez plus cette vidéo !",
+        en: "You don't like this video anymore!"
+    },
+    VIDEO_REMOVED_FROM_THE_PLAYLIST: {
+        fr: "Vidéo retirée de la liste de lecture !",
+        en: "Video removed from the playlist!"
     },
 
 

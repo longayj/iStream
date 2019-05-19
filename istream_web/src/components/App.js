@@ -229,13 +229,18 @@ class App extends React.Component {
         );
 
         const appBarButton = (
-            <ToggleButton
-                icon={true}
-                onStateChange={this.hangleSettingsStateChange.bind(this)}
-                isActive={this.props.settingsToggleActive}
+            <Tooltip
+                title={Texts.SETTINGS[this.props.profile.languageString]}
+                aria-label={Texts.SETTINGS[this.props.profile.languageString]}
             >
-                <SettingsIcon />
-            </ToggleButton>
+                <ToggleButton
+                    icon={true}
+                    onStateChange={this.hangleSettingsStateChange.bind(this)}
+                    isActive={this.props.settingsToggleActive}
+                >
+                    <SettingsIcon />
+                </ToggleButton>
+            </Tooltip>
         );
 
         const logoutButton = (

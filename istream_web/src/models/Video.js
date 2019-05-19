@@ -37,6 +37,7 @@ const defaultState = {
         actors: ""
     },
     posterUrl: "",
+    total_likes: 0,
     liked: false,
     type: VideoTypes.MOVIE,
     currentBestStreamingQuality: "",
@@ -213,6 +214,20 @@ class Video {
                 defaultState.posterUrl
                 :
                 state.posterUrl
+        );
+
+        this.total_likes = (
+            (state.total_likes === undefined || state.total_likes === null) ?
+                defaultState.total_likes
+                :
+                state.total_likes
+        );
+
+        this.liked = (
+            (state.liked === undefined || state.liked === null) ?
+                defaultState.liked
+                :
+                state.liked
         );
 
         this.type = (

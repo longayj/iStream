@@ -18,7 +18,9 @@ const Fields = {
     SECONDARY_COLOR: "secondaryColor",
     PREFERRED_STREAM_LANGUAGE: "preferredStreamLanguage",
     PREFERRED_STREAM_QUALITY: "preferredStreamQuality",
-    SHARED: "shared"
+    SHARED: "shared",
+    PAGE: "page",
+    PER_PAGE: "per_page"
 };
 
 export default Fields;

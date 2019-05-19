@@ -24,10 +24,16 @@ import {
 } from "../../redux/actions/myVideosActions";
 import {withRouter} from "react-router-dom";
 
-import {Button, InputBase, Toolbar} from "@material-ui/core/es/index";
+import {Button, Grid, InputBase, Toolbar, Typography} from "@material-ui/core/es/index";
+
 import SearchIcon from '@material-ui/icons/Search';
+import PrevIcon from '@material-ui/icons/SkipPrevious';
+import NextIcon from '@material-ui/icons/SkipNext';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
+
 import {fade} from "@material-ui/core/es/styles/colorManipulator";
+import VideoCard from "../VideoCard";
+import Fields from "../../constants/Fields";
 
 const styles = theme => ({
     root: {
@@ -81,16 +87,28 @@ const styles = theme => ({
 
 class MyVideos extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            page: 1,
+            per_page: 10,
+            total_page: 1
+        };
+    }
     componentDidMount() {
-        if (this.props.myVideosIsLoad === false) {
+        /*if (this.props.myVideosIsLoad === false) {
             this.getMyVideos();
-        }
+        }*/
+        this.getMyVideos(this.state.page);
     }
 
-    getMyVideos() {
+    getMyVideos(page) {
         let params = {};
 
         let me = this;
+
+        params[Fields.PAGE] = page;
+        params[Fields.PER_PAGE] = this.state.per_page;
 
         if (!CommunicationApi.checkToken()) {
             this.props.history.push('/auth');
@@ -114,6 +132,10 @@ class MyVideos extends React.Component {
                         videos.push(new Video(item,
                             me.props.profile.preferredStreamLanguage,
                             me.props.profile.preferredStreamQuality));
+                    });
+
+                    me.setState({
+                        total_page: response.data.total_page
                     });
 
                     me.props.myVideosSetVideos(videos);
@@ -158,6 +180,22 @@ class MyVideos extends React.Component {
         this.props.globalDisplayAddVideoModal();
     }
 
+    handlePrevPageClick() {
+        let new_page = this.state.page - 1;
+        this.setState({
+            page: new_page
+        });
+        this.getMyVideos(new_page);
+    }
+
+    handleNextPageClick() {
+        let new_page = this.state.page + 1;
+        this.setState({
+            page: new_page
+        });
+        this.getMyVideos(new_page);
+    }
+
     render() {
 
         const { classes } = this.props;
@@ -191,6 +229,50 @@ class MyVideos extends React.Component {
 
                 <br/>
 
+                <Grid container spacing={24} style={{padding: 24}}>
+                    {
+                        this.props.videos.map(currentVideo => (
+                            <Grid key={currentVideo.id} item xs={12} sm={6} lg={4} xl={3}>
+                                <VideoCard video={currentVideo} sourceInterface={"myVideos"}/>
+                            </Grid>
+                        ))
+                    }
+                </Grid>
+                {
+                    this.props.myVideosIsLoad == true &&
+
+                    <Grid container justify="center">
+                        {
+                            this.state.page > 1 &&
+
+                            <Button
+                                color={"primary"}
+                                variant={"contained"}
+                                onClick={this.handlePrevPageClick.bind(this)}
+                            >
+                                <PrevIcon />&nbsp;
+                                {Texts.PREVIOUS_PAGE[this.props.profile.languageString]}
+                            </Button>
+                        }
+                        &nbsp;
+                        <Typography style={{textAlign: "center"}} variant="h6">
+                            {Texts.PAGE[this.props.profile.languageString] + " " + this.state.page + " / " + this.state.total_page}
+                        </Typography>
+                        &nbsp;
+                        {
+                            this.state.page < this.state.total_page &&
+
+                            <Button
+                                color={"primary"}
+                                variant={"contained"}
+                                onClick={this.handleNextPageClick.bind(this)}
+                            >
+                                <NextIcon />&nbsp;
+                                {Texts.NEXT_PAGE[this.props.profile.languageString]}
+                            </Button>
+                        }
+                    </Grid>
+                }
             </div>
         );
     }
@@ -201,6 +283,8 @@ function mapStateToProps(state) {
         profile: state.global.profile,
 
         myVideosIsLoad: state.global.myVideosIsLoad,
+
+        videos: state.myvideos.videos
     };
 }
 

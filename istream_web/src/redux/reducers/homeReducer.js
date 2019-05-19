@@ -1,5 +1,6 @@
 import {
     HOME_SET_VIDEOS,
+    HOME_SET_VIDEO_LIKE,
     HOME_SET_VIDEO,
     HOME_SET_VIDEOS_STREAM_PREFERENCES,
     HOME_ADD_VIDEO,
@@ -22,6 +23,18 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 videos: action.payload
+            };
+        case HOME_SET_VIDEO_LIKE:
+            videos = state.videos;
+            index = videos.findIndex(function (item) {
+                return item.id === action.payload.id;
+            });
+            if (index !== -1 && videos[index].liked != action.payload.liked) {
+                videos[index].liked = action.payload.liked;
+            }
+            return {
+                ...state,
+                videos: videos
             };
         case HOME_SET_VIDEO:
 

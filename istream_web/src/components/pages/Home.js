@@ -22,6 +22,8 @@ import Button from '@material-ui/core/Button';
 
 import SearchIcon from '@material-ui/icons/Search';
 import AddToQueueIcon from '@material-ui/icons/AddToQueue';
+import PrevIcon from '@material-ui/icons/SkipPrevious';
+import NextIcon from '@material-ui/icons/SkipNext';
 
 import VideoCard from "../VideoCard";
 
@@ -35,7 +37,8 @@ import Status from "../../constants/Status";
 import Texts from "../../constants/Texts";
 import {withRouter} from "react-router-dom";
 import {fade} from "@material-ui/core/es/styles/colorManipulator";
-import {IconButton, InputBase} from "@material-ui/core/es/index";
+import {IconButton, InputBase, Typography} from "@material-ui/core/es/index";
+import Fields from "../../constants/Fields";
 
 const styles = theme => ({
     root: {
@@ -89,14 +92,32 @@ const styles = theme => ({
 
 class Home extends React.Component {
 
-    componentDidMount() {
-        if (this.props.homeIsLoad === false) {
-            this.getVideos();
+    constructor(props) {
+        super(props);
+        this.state = {
+            search_text: "",
+            page: 1,
+            per_page: 10,
+            total_page: 1
         }
     }
 
-    getVideos() {
+    componentDidMount() {
+        /*if (this.props.homeIsLoad === false) {
+            this.getVideos();
+        }*/
+        this.getVideos(this.state.page);
+    }
+
+    getVideos(page, q) {
         let params = {};
+
+        if (q != null && q != undefined && q != "") {
+            params[Fields.Q] = q;
+        }
+
+        params[Fields.PAGE] = page;
+        params[Fields.PER_PAGE] = this.state.per_page;
 
         let me = this;
 
@@ -116,10 +137,14 @@ class Home extends React.Component {
 
                     let videos = [];
 
-                    response.data.forEach(function (item) {
+                    response.data.videos.forEach(function (item) {
                         videos.push(new Video(item,
                             me.props.profile.preferredStreamLanguage,
                             me.props.profile.preferredStreamQuality));
+                    });
+
+                    me.setState({
+                        total_page: response.data.total_page
                     });
 
                     me.props.homeSetVideos(videos);
@@ -155,16 +180,44 @@ class Home extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
-    handleSearchClick() {
+    onSearchTextChange(event) {
+        this.setState({
+            search_text: event.target.value
+        });
+    }
 
+    handlePressEnterSearch(ev) {
+
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+
+            this.getVideos(1, this.state.search_text);
+        }
     }
 
     handleAddVideoClick() {
         this.props.globalDisplayAddVideoModal();
+    }
+
+    handlePrevPageClick() {
+        let new_page = this.state.page - 1;
+        this.setState({
+            page: new_page
+        });
+        this.getVideos(new_page, this.state.search_text);
+    }
+
+    handleNextPageClick() {
+        let new_page = this.state.page + 1;
+        this.setState({
+            page: new_page
+        });
+        this.getVideos(new_page, this.state.search_text);
     }
 
     render() {
@@ -189,7 +242,10 @@ class Home extends React.Component {
                             <SearchIcon />
                         </div>
                         <InputBase
+                            onKeyPress={this.handlePressEnterSearch.bind(this)}
+                            onChange={this.onSearchTextChange.bind(this)}
                             placeholder={Texts.SEARCH[this.props.profile.languageString]}
+                            value={this.state.search_text}
                             classes={{
                                 root: classes.inputRoot,
                                 input: classes.inputInput,
@@ -206,11 +262,46 @@ class Home extends React.Component {
 
                         this.props.videos.map(currentVideo => (
                             <Grid key={currentVideo.id} item xs={12} sm={6} lg={4} xl={3}>
-                                <VideoCard video={currentVideo} />
+                                <VideoCard video={currentVideo} sourceInterface={"home"}/>
                             </Grid>
                         ))
                     }
                 </Grid>
+                {
+                    this.props.homeIsLoad == true &&
+
+                    <Grid container justify="center">
+                        {
+                            this.state.page > 1 &&
+
+                            <Button
+                                color={"primary"}
+                                variant={"contained"}
+                                onClick={this.handlePrevPageClick.bind(this)}
+                            >
+                                <PrevIcon />&nbsp;
+                                {Texts.PREVIOUS_PAGE[this.props.profile.languageString]}
+                            </Button>
+                        }
+                        &nbsp;
+                        <Typography style={{textAlign: "center"}} variant="h6">
+                            {Texts.PAGE[this.props.profile.languageString] + " " + this.state.page + " / " + this.state.total_page}
+                        </Typography>
+                        &nbsp;
+                        {
+                            this.state.page < this.state.total_page &&
+
+                            <Button
+                                color={"primary"}
+                                variant={"contained"}
+                                onClick={this.handleNextPageClick.bind(this)}
+                            >
+                                <NextIcon />&nbsp;
+                                {Texts.NEXT_PAGE[this.props.profile.languageString]}
+                            </Button>
+                        }
+                    </Grid>
+                }
             </div>
         );
     }

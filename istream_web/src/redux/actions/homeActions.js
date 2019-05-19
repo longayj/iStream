@@ -1,5 +1,6 @@
 import {
     HOME_SET_VIDEOS,
+    HOME_SET_VIDEO_LIKE,
     HOME_SET_VIDEO,
     HOME_SET_VIDEOS_STREAM_PREFERENCES,
     HOME_ADD_VIDEO,
@@ -10,6 +11,13 @@ export const homeSetVideos = (videos) => {
     return {
         type: HOME_SET_VIDEOS,
         payload: videos
+    };
+};
+
+export const homeSetVideoLike = (info) => {
+    return {
+        type: HOME_SET_VIDEO_LIKE,
+        payload: info
     };
 };
 
