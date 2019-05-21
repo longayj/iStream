@@ -2,7 +2,7 @@
 import Axios from "axios";
 
 var defaultToken:string = "";
-var private_config = require('../configs/private.json');
+var private_config = require('../../private.json');
 
 export class AllDebridApi {
 

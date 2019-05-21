@@ -6,7 +6,8 @@ import {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayConfirmDialog,
-    globalDisplayNotificationSnackbar
+    globalDisplayNotificationSnackbar,
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -48,6 +49,7 @@ import Texts from "../../constants/Texts";
 import Fields from "../../constants/Fields";
 
 import ZoneItem from "../../models/ZoneItem";
+import {withRouter} from "react-router-dom";
 
 const styles = theme => ({
     root: {
@@ -93,6 +95,11 @@ class Zone extends React.Component {
         let params = {};
 
         params[Fields.PATH] = path;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         let me = this;
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.ZONE_NEWS, params);
@@ -153,7 +160,8 @@ class Zone extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -163,6 +171,11 @@ class Zone extends React.Component {
         params[Fields.Q] = this.state.search;
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.ZONE, params);
@@ -212,7 +225,8 @@ class Zone extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -223,6 +237,11 @@ class Zone extends React.Component {
         params[Fields.URL] = props.item.link;
         params[Fields.TITLE] = props.item.title;
         params[Fields.IMAGE_URL] = props.item.imageUrl;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.ZONE, params);
@@ -263,7 +282,8 @@ class Zone extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -464,12 +484,13 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
     //GLOBAL
     globalDisplayAlertDialog,
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayConfirmDialog,
-    globalDisplayNotificationSnackbar
+    globalDisplayNotificationSnackbar,
+    globalReset
 
-})(withStyles(styles, { withTheme: true })(Zone));
+})(withStyles(styles, { withTheme: true })(Zone)));

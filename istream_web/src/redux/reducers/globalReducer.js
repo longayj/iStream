@@ -12,6 +12,12 @@ import {
     GLOBAL_DISPLAY_CONFIRM_DIALOG,
     GLOBAL_DISMISS_CONFIRM_DIALOG,
 
+    GLOBAL_DISPLAY_CREATE_PLAYLIST_MODAL,
+    GLOBAL_DISMISS_CREATE_PLAYLIST_MODAL,
+
+    GLOBAL_DISPLAY_ADD_VIDEO_TO_PLAYLIST_MODAL,
+    GLOBAL_DISMISS_ADD_VIDEO_TO_PLAYLIST_MODAL,
+
     GLOBAL_DISPLAY_ADD_VIDEO_MODAL,
     GLOBAL_DISMISS_ADD_VIDEO_MODAL,
     GLOBAL_ADD_VIDEO_MODAL_SET_VIDEO_TITLE,
@@ -39,8 +45,11 @@ import {
     GLOBAL_SET_NAVIGATION,
     GLOBAL_SET_MOBILE_DRAWER_IS_OPEN,
 
-    GLOBAL_FAVORITE_IS_LOAD,
+    GLOBAL_LOGOUT,
+
+    GLOBAL_PLAYLISTS_IS_LOAD,
     GLOBAL_HOME_IS_LOAD,
+    GLOBAL_MY_VIDEOS_IS_LOAD,
 
     GLOBAL_RESET
 
@@ -68,6 +77,12 @@ const initialState = {
     confirmCallBackFunc: function () {},
     confirmCallBackProps: {},
 
+    showCreatePlaylistModal: false,
+
+    showAddVideoToPlaylistModal: false,
+    addVideoToPlaylistModalVideoTitle: "",
+    addVideoToPlaylistModalVideoId: -1,
+
     showAddVideoModal: false,
     addVideoModalVideoTitle: "",
     addVideoModalVideoTitleError: true,
@@ -84,10 +99,11 @@ const initialState = {
     addVideoModalCurrentVideoPoster: "",
 
     profile: {
-        auth: true,
-        isAdmin: false,
-        username: "Macubix",
-        email: "macubix@gmail.com",
+        id: -1,
+        auth: false,
+        isAdmin: true,
+        username: "",
+        email: "",
         pictureUrl: "",
         darkMode: false,
         primaryColor: "#338ABD",
@@ -98,8 +114,8 @@ const initialState = {
     },
 
     settingsProfile: {
-        username: "Macubix",
-        email: "macubix@gmail.com",
+        username: "",
+        email: "",
         pictureUrl: "",
         darkMode: false,
         primaryColor: "#338ABD",
@@ -115,7 +131,8 @@ const initialState = {
     settingsToggleActive: false,
 
     homeIsLoad: false,
-    favoriteIsLoad: false
+    myVideosIsLoad: false,
+    playlistsIsLoad: false
 };
 
 export default (state = initialState, action) => {
@@ -178,6 +195,32 @@ export default (state = initialState, action) => {
                 confirmTarget: initialState.confirmTarget,
                 confirmCallBackFunc: initialState.confirmCallBackFunc,
                 confirmCallBackProps: initialState.confirmCallBackProps
+            };
+
+        case GLOBAL_DISPLAY_CREATE_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showCreatePlaylistModal: true
+            };
+        case GLOBAL_DISMISS_CREATE_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showCreatePlaylistModal: false
+            };
+
+        case GLOBAL_DISPLAY_ADD_VIDEO_TO_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showAddVideoToPlaylistModal: true,
+                addVideoToPlaylistModalVideoTitle: action.payload.title,
+                addVideoToPlaylistModalVideoId: action.payload.id
+            };
+        case GLOBAL_DISMISS_ADD_VIDEO_TO_PLAYLIST_MODAL:
+            return {
+                ...state,
+                showAddVideoToPlaylistModal: false,
+                addVideoToPlaylistModalVideoTitle: initialState.addVideoToPlaylistModalVideoTitle,
+                addVideoToPlaylistModalVideoId: initialState.addVideoToPlaylistModalVideoId
             };
 
         case GLOBAL_DISPLAY_ADD_VIDEO_MODAL:
@@ -252,6 +295,7 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 profile: {
+                    id: action.payload.id,
                     auth: true,
                     isAdmin: action.payload.isAdmin,
                     username: action.payload.username,
@@ -260,7 +304,9 @@ export default (state = initialState, action) => {
                     darkMode: action.payload.darkMode,
                     primaryColor: action.payload.primaryColor,
                     secondaryColor: action.payload.secondaryColor,
-                    languageString: action.payload.languageString
+                    languageString: action.payload.languageString,
+                    preferredStreamLanguage: action.payload.preferredStreamLanguage,
+                    preferredStreamQuality: action.payload.preferredStreamQuality
                 },
                 settingsProfile: {
                     username: action.payload.username,
@@ -269,7 +315,9 @@ export default (state = initialState, action) => {
                     darkMode: action.payload.darkMode,
                     primaryColor: action.payload.primaryColor,
                     secondaryColor: action.payload.secondaryColor,
-                    languageString: action.payload.languageString
+                    languageString: action.payload.languageString,
+                    preferredStreamLanguage: action.payload.preferredStreamLanguage,
+                    preferredStreamQuality: action.payload.preferredStreamQuality
                 }
             };
         case GLOBAL_AUTH_FAILURE:
@@ -388,15 +436,27 @@ export default (state = initialState, action) => {
                 ...state,
                 mobileDrawerOpen: action.payload
             };
+        case GLOBAL_LOGOUT:
+            return {
+                ...state,
+                homeIsLoad: false,
+                myVideosIsLoad: false,
+                playlistsIsLoad: false
+            };
         case GLOBAL_HOME_IS_LOAD:
             return {
                 ...state,
                 homeIsLoad: true
             };
-        case GLOBAL_FAVORITE_IS_LOAD:
+        case GLOBAL_MY_VIDEOS_IS_LOAD:
             return {
                 ...state,
-                favoriteIsLoad: true
+                myVideosIsLoad: true
+            };
+        case GLOBAL_PLAYLISTS_IS_LOAD:
+            return {
+                ...state,
+                playlistsIsLoad: true
             };
         case GLOBAL_RESET:
             return initialState;

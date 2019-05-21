@@ -54,7 +54,7 @@ NotificationSnackbar.defaultProps = {
     autoHideDuration: 6000,
     text: "",
     verticalAnchorOrigin: "bottom",
-    horizontalAnchorOrigin: "left"
+    horizontalAnchorOrigin: "right"
 };
 
 NotificationSnackbar.propTypes = {

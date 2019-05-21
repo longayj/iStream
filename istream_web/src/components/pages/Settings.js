@@ -12,7 +12,13 @@ import {
     globalSettingsSetPrincipalColor,
     globalSettingsSetSecondaryColor,
     globalResetSettingsChanges,
-    globalApplySettingsChanges
+    globalApplySettingsChanges,
+
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalDisplayAlertDialog,
+
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -38,6 +44,12 @@ import { SketchPicker } from 'react-color';
 import Languages from "../../constants/Languages";
 import VideoQualities from "../../constants/VideoQualities";
 import Texts from "../../constants/Texts"
+import Fields from "../../constants/Fields";
+import CommunicationApi from "../../utils/CommunicationApi";
+import HttpMethods from "../../constants/HttpMethods";
+import Paths from "../../constants/Paths";
+import Status from "../../constants/Status";
+import {withRouter} from "react-router-dom";
 
 const styles = theme => ({
     root: {
@@ -55,7 +67,7 @@ const styles = theme => ({
     },
     formControl: {
         margin: theme.spacing.unit * 2,
-    },
+    }
 });
 
 class Settings extends React.Component {
@@ -97,17 +109,79 @@ class Settings extends React.Component {
         this.props.globalResetSettingsChanges();
     }
 
-    handleApplyClick() {
-        if (this.props.settingsProfile.preferredStreamLanguage !== this.props.profile.preferredStreamLanguage ||
-        this.props.settingsProfile.preferredStreamQuality !== this.props.profile.preferredStreamQuality) {
+    applySettings() {
+        let params = {};
 
-            this.props.homeSetVideosStreamPreferences({
-                language: this.props.settingsProfile.preferredStreamLanguage,
-                quality: this.props.settingsProfile.preferredStreamQuality
-            });
+        let me = this;
 
+        params[Fields.USERNAME] = this.props.settingsProfile.username;
+        params[Fields.EMAIL] = this.props.settingsProfile.email;
+        params[Fields.LANGUAGE] = this.props.settingsProfile.languageString;
+        params[Fields.DARK_MODE] = this.props.settingsProfile.darkMode;
+        params[Fields.PRIMARY_COLOR] = this.props.settingsProfile.primaryColor;
+        params[Fields.SECONDARY_COLOR] = this.props.settingsProfile.secondaryColor;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
         }
-        this.props.globalApplySettingsChanges();
+
+        this.props.globalDisplayLoadMask();
+        let communication = new CommunicationApi(HttpMethods.PUT, Paths.HOST + Paths.USER + "/" + this.props.profile.id, params);
+        communication.sendRequest(
+            function (response) {
+
+                me.props.globalDismissLoadMask();
+
+                if (response.status === 200) {
+
+                    if (me.props.settingsProfile.preferredStreamLanguage !== me.props.profile.preferredStreamLanguage ||
+                        me.props.settingsProfile.preferredStreamQuality !== me.props.profile.preferredStreamQuality) {
+
+                        me.props.homeSetVideosStreamPreferences({
+                            language: me.props.settingsProfile.preferredStreamLanguage,
+                            quality: me.props.settingsProfile.preferredStreamQuality
+                        });
+
+                    }
+                    me.props.globalApplySettingsChanges();
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            function (error) {
+
+                me.props.globalDismissLoadMask();
+
+                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                        text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[error.response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            true
+        );
+    }
+
+    handleApplyClick() {
+        console.log(this.props.settingsProfile);
+        this.applySettings();
     }
 
     settingsHasChanges() {
@@ -157,6 +231,7 @@ class Settings extends React.Component {
                                     label={Texts.USERNAME[this.props.profile.languageString]}
                                     type="text"
                                     fullWidth
+                                    disabled={true}
                                     required
                                 />
                             </FormControl>
@@ -314,7 +389,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
     globalSettingsSetLanguage,
     globalSettingsSetUsername,
     globalSettingsSetEmail,
@@ -326,5 +401,11 @@ export default connect(mapStateToProps, {
     globalResetSettingsChanges,
     globalApplySettingsChanges,
 
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalDisplayAlertDialog,
+
+    globalReset,
+
     homeSetVideosStreamPreferences
-})(withStyles(styles)(Settings));
+})(withStyles(styles)(Settings)));

@@ -13,12 +13,14 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
-import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import MovieIcon from '@material-ui/icons/Movie';
 import TvIcon from '@material-ui/icons/Tv';
 import ClearIcon from '@material-ui/icons/Clear';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import CommunicationApi from "../utils/CommunicationApi";
 import HttpMethods from "../constants/HttpMethods";
@@ -33,8 +35,12 @@ import {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayAlertDialog,
+    globalDisplayNotificationSnackbar,
+    globalDisplayAddVideoToPlaylistModal,
 
-    globalSetNavigation
+    globalSetNavigation,
+
+    globalReset
 } from "../redux/actions/globalActions";
 
 import {
@@ -42,10 +48,17 @@ import {
 } from "../redux/actions/videoActions";
 
 import {
-    homeDeleteVideo
+    myVideosDeleteVideo,
+    myVideosSetVideoLike
+} from "../redux/actions/myVideosActions";
+
+import {
+    homeDeleteVideo,
+    homeSetVideoLike
 } from "../redux/actions/homeActions";
 
 import "../styles/VideoCard.css";
+import {Button, Tooltip} from "@material-ui/core/es/index";
 
 const styles = {
     card: {
@@ -74,6 +87,11 @@ class VideoCard extends React.Component {
 
     deleteVideo(props) {
 
+        if (!CommunicationApi.checkToken()) {
+            props.history.push('/auth');
+            props.globalReset();
+        }
+
         props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.DELETE, Paths.HOST + Paths.VIDEOS + "/" + props.video.id, {});
         communication.sendRequest(
@@ -83,7 +101,11 @@ class VideoCard extends React.Component {
 
                 if (response.status === 200) {
 
-                    props.homeDeleteVideo(props.video.id);
+                    if (props.sourceInterface == "myVideos") {
+                        props.myVideosDeleteVideo(props.video.id);
+                    } else if (props.sourceInterface == "home") {
+                        props.homeDeleteVideo(props.video.id);
+                    }
 
                 } else {
 
@@ -113,7 +135,8 @@ class VideoCard extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -132,13 +155,154 @@ class VideoCard extends React.Component {
                 globalDismissLoadMask: this.props.globalDismissLoadMask,
                 globalDisplayAlertDialog: this.props.globalDisplayAlertDialog,
                 profile: this.props.profile,
-                homeDeleteVideo: this.props.homeDeleteVideo
+                homeDeleteVideo: this.props.homeDeleteVideo,
+                globalReset: this.props.globalReset,
+                history: this.props.history,
+                sourceInterface: this.props.sourceInterface,
+                myVideosDeleteVideo: this.props.myVideosDeleteVideo
             }
         });
     }
 
     handleLikeClick() {
+        let params = {};
 
+        let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
+
+        this.props.globalDisplayLoadMask();
+        let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.VIDEOS + "/" + this.props.video.id + Paths.LIKES, params);
+        communication.sendRequest(
+            function (response) {
+
+                me.props.globalDismissLoadMask();
+
+                if (response.status === 200) {
+
+                    if (me.props.sourceInterface == "myVideos") {
+                        me.props.myVideosSetVideoLike({
+                            id: me.props.video.id,
+                            liked: true
+                        });
+                    } else if (me.props.sourceInterface == "home") {
+                        me.props.homeSetVideoLike({
+                            id: me.props.video.id,
+                            liked: true
+                        });
+                    }
+
+                    me.props.globalDisplayNotificationSnackbar(Texts.VIDEO_LIKED[me.props.profile.languageString]);
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            function (error) {
+                console.log(error);
+
+                me.props.globalDismissLoadMask();
+
+                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                        text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[error.response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            true
+        );
+    }
+
+    handleDislikeClick() {
+        let params = {};
+
+        let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
+
+        this.props.globalDisplayLoadMask();
+        let communication = new CommunicationApi(HttpMethods.DELETE, Paths.HOST + Paths.VIDEOS + "/" + this.props.video.id + Paths.LIKES, params);
+        communication.sendRequest(
+            function (response) {
+
+                me.props.globalDismissLoadMask();
+
+                if (response.status === 200) {
+
+                    if (me.props.sourceInterface == "myVideos") {
+                        me.props.myVideosSetVideoLike({
+                            id: me.props.video.id,
+                            liked: false
+                        });
+                    } else if (me.props.sourceInterface == "home") {
+                        me.props.homeSetVideoLike({
+                            id: me.props.video.id,
+                            liked: false
+                        });
+                    }
+
+                    me.props.globalDisplayNotificationSnackbar(Texts.VIDEO_DISLIKED[me.props.profile.languageString]);
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            function (error) {
+                console.log(error);
+
+                me.props.globalDismissLoadMask();
+
+                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                        text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[error.response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            true
+        );
+    }
+
+    handleAddToAPlayistClick() {
+        this.props.globalDisplayAddVideoToPlaylistModal({
+            title: this.props.video.title + ", " + this.props.video.castingShort.directors + " (" + this.props.video.productionYear + ")",
+            id: this.props.video.id
+        });
     }
 
     render() {
@@ -170,7 +334,7 @@ class VideoCard extends React.Component {
                     <CardContent>
                         <Typography gutterBottom variant="h6">
                             {this.props.video.title + ", " + this.props.video.productionYear + " "}
-
+                            <br/>
                             {
                                 this.props.video.type === VideoTypes.MOVIE &&
 
@@ -198,10 +362,55 @@ class VideoCard extends React.Component {
                     </CardContent>
                 </CardActionArea>
                 <CardActions>
-                    <Button onClick={this.handleLikeClick.bind(this)} color={"primary"} variant={"contained"}>
-                        <FavoriteBorderIcon/>
-                        {Texts.LIKE[this.props.profile.languageString]}
-                    </Button>
+
+                    {
+                        this.props.video.liked == false &&
+
+                        <Tooltip
+                            title={Texts.LIKE[this.props.profile.languageString]}
+                            aria-label={Texts.LIKE[this.props.profile.languageString]}
+                        >
+                            <Button
+                                onClick={this.handleLikeClick.bind(this)}
+                                color={"secondary"}
+                                variant={"contained"}
+                            >
+                                <FavoriteBorderIcon/>&nbsp;
+                                {this.props.video.total_likes}
+                            </Button>
+                        </Tooltip>
+                    }
+
+                    {
+                        this.props.video.liked == true &&
+
+                        <Tooltip
+                            title={Texts.LIKE[this.props.profile.languageString]}
+                            aria-label={Texts.LIKE[this.props.profile.languageString]}
+                        >
+                            <Button
+                                onClick={this.handleDislikeClick.bind(this)}
+                                color={"secondary"}
+                                variant={"contained"}
+                            >
+                                <FavoriteIcon/>&nbsp;
+                                {this.props.video.total_likes}
+                            </Button>
+                        </Tooltip>
+                    }
+
+                    <Tooltip
+                        title={Texts.ADD_TO_A_PLAYLIST[this.props.profile.languageString]}
+                        aria-label={Texts.ADD_TO_A_PLAYLIST[this.props.profile.languageString]}
+                    >
+                        <IconButton
+                            onClick={this.handleAddToAPlayistClick.bind(this)}
+                            color={"primary"}
+                            variant={"contained"}
+                        >
+                            <PlaylistAddIcon />
+                        </IconButton>
+                    </Tooltip>
                 </CardActions>
             </Card>
         )
@@ -213,13 +422,15 @@ VideoCard.defaultProps = {
         title: "",
         type: "",
         description: ""
-    }
+    },
+    sourceInterface: ""
 };
 
 
 VideoCard.propTypes = {
     classes: PropTypes.object.isRequired,
-    video: PropTypes.object.isRequired
+    video: PropTypes.object.isRequired,
+    sourceInterface: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
@@ -238,13 +449,23 @@ export default withRouter(connect(mapStateToProps, {
     globalDisplayLoadMask,
     globalDismissLoadMask,
     globalDisplayAlertDialog,
+    globalDisplayNotificationSnackbar,
+
+    globalDisplayAddVideoToPlaylistModal,
 
     globalSetNavigation,
+
+    globalReset,
 
     //VIDEO
     videoSetVideo,
 
     //HOME
-    homeDeleteVideo
+    homeDeleteVideo,
+    homeSetVideoLike,
+
+    //MYVIDEOS
+    myVideosDeleteVideo,
+    myVideosSetVideoLike
 
 })(withStyles(styles, { withTheme: true })(VideoCard)));

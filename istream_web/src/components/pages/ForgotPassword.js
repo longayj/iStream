@@ -51,7 +51,7 @@ class ForgotPassword extends React.Component {
             open: true,
 
             login: "",
-            loginError: true,
+            loginError: false,
             languageString: (props.location.state === undefined ?
                 Languages.English : props.location.state.languageString)
         }

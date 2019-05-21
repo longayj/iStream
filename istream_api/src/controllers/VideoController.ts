@@ -1,9 +1,13 @@
 import { Router, Request, Response } from 'express';
-
-import {Video, Statistics, CastingShort, Streaming} from '../entity'
-import { createConnection } from 'typeorm';
+import {Like as MyLike} from '../entity/Like'
+import {Video, Statistics, CastingShort, Streaming, Like} from '../entity'
+import { createConnection} from 'typeorm';
+import {Like as like} from 'typeorm'
 import { AlloCineApi, AllDebridApi } from '../Utils';
 import Axios from '../../node_modules/axios';
+import { checkJwt } from "../middlewares/checkJwt";
+import { checkRole } from "../middlewares/checkRole";
+
 
 const router: Router = Router();
 
@@ -12,13 +16,61 @@ createConnection(/*...*/).then(async connection => {
     
 // route get /videos
 router.get('/', (req: Request, res: Response) => {
-    connection.getRepository(Video).find({relations: ["statistics", "streaming", "castingShort"]})
+    let page = req.query.page || 0
+    let per_page = req.query.per_page || 10
+    // limit superieur du nombre par page
+    if (per_page > 100)
+        per_page = 100
+    // limit inferieur du nombre par page
+    if (per_page <= 0)
+        per_page = 1
+    // limit inferieur des page
+    if (page <= 0)
+        page = 1
+    // les page commence a 0 donc -- 
+    --page
+
+    let mywhere:any = {
+    }
+    let q = req.query.q || undefined
+    if (q != undefined) {
+        mywhere = [
+            {originalTitle: like("%" + q + "%")},
+            {title: like("%" + q + "%")},
+            {description: like("%" + q + "%")},
+            {actors: like("%" + q + "%")},
+            {directors: like("%" + q + "%")}
+        ]
+        //console.log("mywhere set !")
+    }
+    connection.getRepository(Video)
+    .findAndCount({
+        relations: ["statistics", "streaming", "castingShort", "likes"],
+        where: mywhere,
+        skip: page * per_page,
+        take: per_page
+    })
     .then(videos => {
-        if (videos == undefined || videos == null) {
+        let testvideos: [any[], Number] = videos
+        //console.log(videos)
+        if (videos[0] == undefined || videos[0] == null) {
             res.status(404).send("No videos sorry :(");
             return;
         }
-       res.send(videos);
+        let videoRes:any = new Object
+        videoRes.per_page = per_page
+        videoRes.page = page + 1
+        let count = videos[1]
+        if (count / per_page < 1)
+            videoRes.total_page = 1
+        else
+            videoRes.total_page = Math.ceil(count / per_page)
+        videoRes.total_videos = count
+        for (let i = 0; i < testvideos[0].length; i++) {
+            testvideos[0][i].total_likes = testvideos[0][i].likes.length
+        }
+        videoRes.videos = testvideos[0]
+        res.send(videoRes);
     }).catch(err => {
         console.log(err);
         res.send("Error to find videos");
@@ -73,7 +125,8 @@ router.post('/', (req: Request, res: Response) => {
                 newVideo.posterUrl = movie.poster.href;
             if (movie.release != undefined && movie.release.releaseDate != undefined)
                 newVideo.releaseDate = new Date(movie.release.releaseDate);
-     
+            newVideo.actors = movie.castingShort.actors
+            newVideo.directors = movie.castingShort.directors
             // si casting short create !!
             if (movie.castingShort != undefined) {
                 let castingShort = new CastingShort
@@ -277,7 +330,7 @@ router.get('/:id', (req: Request, res: Response) => {
     let id = req.params.id;
 
     connection.getRepository(Video)
-    .findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort"]})
+    .findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort", "likes"]})
     .then(video => {
         console.log(video)
         if (video == undefined || video == null) {
@@ -285,7 +338,7 @@ router.get('/:id', (req: Request, res: Response) => {
             res.status(404).send("Video not found")
             return;
         }
-
+        /*
         // refresh a chaque get /video/:id
         AllDebridApi.getUnlockLink(video.url).then((result) => {
             if (!result.data.success || result.data.error) {
@@ -333,10 +386,13 @@ router.get('/:id', (req: Request, res: Response) => {
         }).catch(err => {
             res.status(500).send("fail to refresh data")
         })
+        */
         // fin du refresh a chaque get /video/:id
 
-        // pour juste return la video 
-        //res.status(200).send(video);
+        // pour juste return la video
+        let testVideo:any = video
+        testVideo.total_likes = video.likes.length 
+        res.status(200).send(testVideo);
 
         // fin du return juste video 
 
@@ -358,12 +414,131 @@ router.get('/:id', (req: Request, res: Response) => {
 
 });
 
+router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
+    let jwttoken = res.locals.jwtPayload
+    console.log("User ", jwttoken.userId, " try to like video id ", req.params.id)
+    if (isNaN(Number.parseInt(req.params.id))) {
+        return res.status(400).send({
+            message: "Bad request"
+        })
+    }
+    
+    connection.getRepository(Video)
+    .findOne({where: {id: req.params.id}, relations: ["statistics", "streaming", "castingShort", "likes"]})
+    .then(async video => {
+        console.log(video)
+        if (video == undefined || video == null)
+            return res.status(404).send({
+                message: "Video id " + req.params.id + " not found"
+            })
+        if (video.likes.length > 0) {
+            console.log("verifie si le mec a pas deja like la photo")
+            var alreadyAdd = false;
+            video.likes.forEach(like => {
+                if (like.userId == jwttoken.userId)
+                    alreadyAdd = true;
+            })
+            if (alreadyAdd) {
+                res.status(403).send({
+                    message : "Picture " + video.id + " already like by " + req.params.id
+                })
+            }  else {
+                let newLike = new MyLike;
+                newLike.userId = jwttoken.userId;
+                // on met ce qu'on veut c'est genre le type de like
+                newLike.value = "1";
+                newLike.video = video;
+                newLike = await connection.manager.save(newLike)
+                delete newLike.video
+                return res.send(newLike)
+            }
+        } else {
+            let newLike = new MyLike;
+            newLike.userId = jwttoken.userId;
+            newLike.value = "1";
+            newLike.video = video;
+            newLike = await connection.manager.save(newLike)
+            delete newLike.video
+            return res.send(newLike)
+        }
+    }).catch(err => {
+        console.log(err)
+        return res.status(500).send({
+            message: "Fail to get videos"
+        })
+    })
+})
+
+router.delete('/:id/likes/:idLike', [checkJwt], (req: Request, res: Response) => {
+    let jwttoken = res.locals.jwtPayload
+    console.log("User ", jwttoken.userId, " try to delete like on video id ", req.params.id)
+    if (isNaN(Number.parseInt(req.params.id))
+        || isNaN(Number.parseInt(req.params.idLike))) {
+        return res.status(400).send({
+            message: "Bad request"
+        })
+    }
+    connection.getRepository(Video).findOne({
+        where:{
+            id: req.params.id
+        },
+        relations:["likes"]
+    }).then(video => {
+        if (video == undefined || video == null)
+            return res.status(404).send({
+                message: "video id not found"
+            })
+        for (let i = 0; i < video.likes.length; i++) {
+            if (video.likes[i].userId == jwttoken.userId)
+            {
+                // il a bien like la video 
+                // essai de suppression
+                connection.getRepository(MyLike).findOne({
+                    where: {
+                        id: req.params.idLike
+                    }
+                }).then(like => {
+                    if (like == undefined || like == null)
+                        return res.status(404).send({
+                            message: "id like not found"
+                        })
+                    connection.getRepository(MyLike).remove(like)
+                    .then(like => {
+                        console.log("like delete ", like)
+                        return res.send({
+                            message: 'like delete'
+                        })
+                    }).catch(err => {
+                        console.log(err)
+                        return res.status(500).send({
+                            message: 'fail to delete like'
+                        })
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    return res.status(500).send({
+                        message: "fail to get like"
+                    })
+                })
+            }
+        }
+        if (video.likes.length == 0)
+            return res.status(404).send({
+                message: "id like not found"
+            })
+    }).catch(err => {
+        console.log(err)
+        return res.status(500).send("fail to get video")
+    })
+    
+})
+
 /**
  * Delete one movie by id
  * @param id the movie id
  * DELETE /videos/:id
  */
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', [checkJwt, checkRole(["ADMIN"])], (req: Request, res: Response) => {
     let id = req.params.id;
     connection.getRepository(Video).findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort"]}).then(video => {
         if (video == undefined || video == null) {

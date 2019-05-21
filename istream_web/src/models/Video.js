@@ -37,6 +37,7 @@ const defaultState = {
         actors: ""
     },
     posterUrl: "",
+    total_likes: 0,
     liked: false,
     type: VideoTypes.MOVIE,
     currentBestStreamingQuality: "",
@@ -215,6 +216,20 @@ class Video {
                 state.posterUrl
         );
 
+        this.total_likes = (
+            (state.total_likes === undefined || state.total_likes === null) ?
+                defaultState.total_likes
+                :
+                state.total_likes
+        );
+
+        this.liked = (
+            (state.liked === undefined || state.liked === null) ?
+                defaultState.liked
+                :
+                state.liked
+        );
+
         this.type = (
             (this.saison === defaultState.saison || this.episode === defaultState.episode) ?
                 VideoTypes.MOVIE
@@ -230,7 +245,7 @@ class Video {
         const STREAM_PARAM = "?resolution=";
 
         return STREAM_PATH + this.streaming.id + STREAM_PARAM +
-            this.currentBestStreamingLanguage + this.currentBestStreamingQuality;
+            this.currentBestStreamingLanguage + this.currentBestStreamingQuality + "&token=" + localStorage.getItem('token');
     }
 
     setCurrentBestStreamingLanguage(value) {
@@ -296,6 +311,8 @@ class Video {
 
             if (identity[key] !== undefined &&
                 me.streaming[key] !== "") {
+
+                console.log(delta, preferredStreamLanguage);
 
                 if (delta[preferredStreamLanguage][identity[key].language] < keepBestLanguageDelta) {
                     keepBestLanguage = identity[key].language;

@@ -6,7 +6,8 @@ import { withRouter } from 'react-router-dom';
 import {
     globalDisplayAlertDialog,
     globalDisplayLoadMask,
-    globalDismissLoadMask
+    globalDismissLoadMask,
+    globalReset
 } from "../../redux/actions/globalActions";
 
 import {
@@ -20,11 +21,14 @@ import {
 } from "../../redux/actions/homeActions";
 
 import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
 import { withStyles } from "@material-ui/core/styles";
 
 import GetAppIcon from "@material-ui/icons/GetApp";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import SendIcon from "@material-ui/icons/Send";
 import RefreshIcon from "@material-ui/icons/Refresh";
 
 import VideoPlayer from "../VideoPlayer";
@@ -37,6 +41,7 @@ import Status from "../../constants/Status";
 import Texts from "../../constants/Texts";
 
 import "../../styles/Video.css"
+import Validator from "../../utils/Validator";
 
 const styles = theme => ({
     container: {
@@ -52,6 +57,14 @@ const styles = theme => ({
 
 class Video extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            comment: "",
+            comment_error: false
+        };
+    }
+
     componentWillMount() {
         if (this.props.video.id === -1) {
             this.props.history.push('/home');
@@ -62,6 +75,11 @@ class Video extends React.Component {
         let params = {};
 
         let me = this;
+
+        if (!CommunicationApi.checkToken()) {
+            this.props.history.push('/auth');
+            this.props.globalReset();
+        }
 
         this.props.globalDisplayLoadMask();
         let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.VIDEOS + "/" + this.props.video.id, params);
@@ -107,7 +125,8 @@ class Video extends React.Component {
                     });
 
                 }
-            }
+            },
+            true
         );
     }
 
@@ -128,6 +147,27 @@ class Video extends React.Component {
         //window.open(this.props.video.downloadLink, '_blank');
     }
 
+    handleCommentChange(event) {
+        let error = true;
+
+        if (Validator.name(event.target.value)) {
+            error = false;
+        }
+
+        this.setState({
+            comment: event.target.value,
+            comment_error: error
+        })
+    }
+
+    handleSendCommentClick() {
+
+    }
+
+    handleLikeClick() {
+
+    }
+
     handleRefreshClick() {
         this.refreshVideo();
     }
@@ -146,15 +186,24 @@ class Video extends React.Component {
                         {this.props.video.title}
                     </Typography>
 
-                    {
-                        this.props.profile.isAdmin === true &&
+                    <br />
 
-                        <div style={{textAlign: "center"}}>
-                            <Button onClick={this.handleRefreshClick.bind(this)} color="primary" variant={"contained"}>
-                                <RefreshIcon /> {Texts.REFRESH[me.props.profile.languageString]}
-                            </Button>
-                        </div>
-                    }
+                    <div style={{textAlign: "center"}}>
+
+                        {
+                            this.props.profile.isAdmin === true &&
+
+
+                                <Button onClick={this.handleRefreshClick.bind(this)} color="primary" variant={"contained"}>
+                                    <RefreshIcon /> {Texts.REFRESH[me.props.profile.languageString]}
+                                </Button>
+                        }
+
+                        <Button onClick={this.handleLikeClick.bind(this)} color={"primary"} variant={"contained"}>
+                            <FavoriteBorderIcon/>
+                            {Texts.LIKE[this.props.profile.languageString]}
+                        </Button>
+                    </div>
 
                     <br />
                     <br />
@@ -247,6 +296,29 @@ class Video extends React.Component {
 
                 </div>
 
+                <br/>
+
+                <div>
+                    <TextField
+                        variant="outlined"
+                        label={Texts.LEAVE_A_COMMENT[this.props.profile.languageString]}
+                        multiline={true}
+                        onChange={this.handleCommentChange.bind(this)}
+                        value={this.state.comment}
+                        margin="dense"
+                        fullWidth
+                        error={this.state.comment_error}
+                    />
+                    <Button
+                        onClick={this.handleSendCommentClick.bind(this)}
+                        variant={"contained"}
+                        color={"primary"}
+                    >
+                        <SendIcon/>
+                        {Texts.SEND[this.props.profile.languageString]}
+                    </Button>
+                </div>
+
             </div>
         );
     }
@@ -267,6 +339,7 @@ export default withRouter(connect(mapStateToProps, {
     globalDisplayAlertDialog,
     globalDisplayLoadMask,
     globalDismissLoadMask,
+    globalReset,
 
     //VIDEO
     videoUnsetVideo,

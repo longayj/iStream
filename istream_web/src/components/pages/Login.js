@@ -19,6 +19,21 @@ import Texts from "../../constants/Texts";
 import Languages from "../../constants/Languages";
 
 import Validator from "../../utils/Validator";
+import CommunicationApi from "../../utils/CommunicationApi";
+import HttpMethods from "../../constants/HttpMethods";
+import Paths from "../../constants/Paths";
+import Status from "../../constants/Status";
+import Fields from "../../constants/Fields";
+
+import {
+    globalAuthSuccess,
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalDisplayAlertDialog,
+    globalSetNavigation
+} from "../../redux/actions/globalActions";
+
+import VideoQualities from "../../constants/VideoQualities";
 
 const styles = theme => ({
     paper: {
@@ -46,9 +61,9 @@ class Login extends React.Component {
             open: true,
 
             login: "",
-            loginError: true,
+            loginError: false,
             password: "",
-            passwordError: true,
+            passwordError: false,
             languageString: (props.location.state === undefined ?
                 Languages.English : props.location.state.languageString)
         }
@@ -89,8 +104,91 @@ class Login extends React.Component {
         });
     }
 
+    login() {
+        let params = {};
+
+        let me = this;
+
+        params[Fields.USERNAME] = this.state.login;
+        params[Fields.PASSWORD] = this.state.password;
+
+        this.props.globalDisplayLoadMask();
+        let communication = new CommunicationApi(HttpMethods.POST, Paths.HOST + Paths.LOGIN, params);
+        communication.sendRequest(
+            function (response) {
+
+                me.props.globalDismissLoadMask();
+
+                if (response.status === 200) {
+
+                    localStorage.setItem('token', response.data.token);
+
+                    me.props.globalSetNavigation({
+                        selectedRoute: "/",
+                        keepPrevRouteSettings: "/",
+                        settingsToggleActive: false
+                    });
+
+                    me.props.globalAuthSuccess({
+                        id: response.data.id,
+                        isAdmin: response.data.isAdmin,
+                        username: response.data.username,
+                        email: response.data.email,
+                        pictureUrl: response.data.pictureUrl,
+                        darkMode: response.data.darkMode,
+                        primaryColor: response.data.primaryColor,
+                        secondaryColor: response.data.secondaryColor,
+                        languageString: response.data.language,
+                        preferredStreamLanguage: response.data.preferredStreamLanguage,
+                        preferredStreamQuality: response.data.preferredStreamQuality
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[response.status][me.props.profile.languageString]
+                    });
+
+                }
+            },
+            function (error) {
+
+                me.props.globalDismissLoadMask();
+
+                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                        text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                    });
+
+                } else {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                        text: Status[error.response.status][me.props.profile.languageString] +
+                        " " + (error.response.data.message != undefined ? error.response.data.message : "")
+                    });
+
+                }
+            }
+        );
+    }
+
     handleSignInClick() {
-        console.log(this.state);
+        //if (!this.state.loginError && !this.state.passwordError) {
+            this.login();
+        //}
+    }
+
+    handlePressEnter(ev) {
+
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+
+            this.handleSignInClick();
+        }
     }
 
     render() {
@@ -152,6 +250,7 @@ class Login extends React.Component {
                                 required
                                 error={this.state.loginError}
                                 helperText={Texts.LOGIN_AUTHENTICATION_RULE[this.state.languageString]}
+                                onKeyPress={this.handlePressEnter.bind(this)}
                             />
 
                             <TextField
@@ -163,9 +262,15 @@ class Login extends React.Component {
                                 fullWidth
                                 required
                                 error={this.state.passwordError}
+                                onKeyPress={this.handlePressEnter.bind(this)}
                             />
 
-                            <Link to={"/passwordLost"} replace style={{ textDecoration: 'none' }}>
+                            <Link to={{
+                                pathname: "/passwordLost",
+                                state: {
+                                    languageString: this.state.languageString
+                                }
+                            }}  replace style={{ textDecoration: 'none' }}>
                                 <Typography>
                                     {Texts.FORGOT_PASSWORD[this.state.languageString] + " ?"}
                                 </Typography>
@@ -197,6 +302,9 @@ function mapStateToProps(state) {
 }
 
 export default withRouter(connect(mapStateToProps, {
-
-
+    globalDisplayLoadMask,
+    globalDismissLoadMask,
+    globalAuthSuccess,
+    globalDisplayAlertDialog,
+    globalSetNavigation
 })(withStyles(styles, { withTheme: true })(Login)));

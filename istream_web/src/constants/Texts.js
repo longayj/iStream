@@ -23,6 +23,14 @@ const Texts = {
         fr: "Ajouter une vidéo",
         en: "Add a video"
     },
+    ADD_A_VIDEO_TO_A_PLAYLIST: {
+        fr: "Ajouter une vidéo à une liste de lecture",
+        en: "Add a video to a playlist"
+    },
+    ADD_TO_A_PLAYLIST: {
+        fr: "Ajouter à une liste de lecture",
+        en: "Add to a playlist"
+    },
     AN_EMAIL_HAS_BEEN_SENT_TO_YOU_WITH_YOUR_NEW_PASSWORD: {
         fr: "Un email vous a été envoyé avec votre nouveau mot de passe. Vérifier votre boite mail pour pouvoir vous connecter.",
         en: "An email has been sent to you with your new password. Check your mailbox to be able to sign in."
@@ -56,6 +64,14 @@ const Texts = {
         fr: "Personnalisation",
         en: "Customisation"
     },
+    CREATE: {
+        fr: "Créer",
+        en: "Create"
+    },
+    CREATE_PLAYLIST: {
+        fr: "Créer une playlist",
+        en: "Create a playlist"
+    },
 
 
     /* D */
@@ -76,6 +92,10 @@ const Texts = {
     DO_REALLY_WANT_TO_DELETE_THIS_VIDEO: {
         fr: "Voulez vous vraiment supprimer cette vidéo ?",
         en: "Do you really want to delete this video ?"
+    },
+    DO_REALLY_WANT_TO_REMOVE_THIS_VIDEO_FROM_THIS_PLAYLIST: {
+        fr: "Voulez vous vraiment retirer cette vidéo de cette liste de lecture ?",
+        en: "Do you really want to remove this video from this playlist?"
     },
     DOWNLOAD: {
         fr: "Télécharger",
@@ -141,6 +161,10 @@ const Texts = {
         fr: "Langage",
         en: "Language"
     },
+    LEAVE_A_COMMENT: {
+        fr: "Laisser un commentaire !",
+        en: "Leave a comment !"
+    },
     LIKE: {
         fr: "J'aime",
         en: "Like"
@@ -153,6 +177,10 @@ const Texts = {
         fr: "Vous pouvez utiliser, au choix, votre nom d'utilisateur ou votre adresse email pour vous authentifier.",
         en: "You can use either your username or your email address in order to authenticate."
     },
+    LOGOUT: {
+        fr: "Se déconnecter",
+        en: "Logout"
+    },
 
 
     /* M */
@@ -162,20 +190,40 @@ const Texts = {
         fr: "Film",
         en: "Movie"
     },
+    MY_VIDEOS: {
+        fr: "Mes vidéos",
+        en: "My videos"
+    },
 
 
     /* N */
 
 
+    NAME: {
+        fr: "Nom",
+        en: "Name"
+    },
     NETWORK_ERROR: {
         fr: "Erreur réseau",
         en: "Network error"
+    },
+    NEXT_PAGE: {
+        fr: "Page suivante",
+        en: "Next page"
+    },
+    NO_VIDEO_TO_DISPLAY: {
+        fr: "Aucune vidéo à afficher ...",
+        en: "No video to display..."
     },
 
 
     /* O */
 
 
+    OF: {
+        fr: "de",
+        en: "of"
+    },
     OK: {
         fr: "OK",
         en: "OK"
@@ -185,6 +233,10 @@ const Texts = {
     /* P */
 
 
+    PAGE: {
+        fr: "Page",
+        en: "Page"
+    },
     PASSWORD: {
         fr: "Mot de passe",
         en: "Password"
@@ -194,8 +246,28 @@ const Texts = {
         en: "Password reset"
     },
     PASSWORD_RULE: {
-        fr: "Le mot de passe doit contenir au moins 8 caractères et au moins une majuscule, une minuscule, un caractère spécial ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : ) et un chiffre.",
-        en: "The password must contain at least 8 characters and at least one up case, one low case, one special character ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : ) and one digit."
+        fr: "Le mot de passe doit contenir au moins 8 caractères et au moins une majuscule, une minuscule, un chiffre et un caractère spécial ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : ).",
+        en: "The password must contain at least 8 characters and at least one up case, one low case, one digit and one special character ( ! @ # $ % _ - ( ) { } [ ] ; , / & * + ? . : )."
+    },
+    PLAY: {
+        fr: "Lecture",
+        en: "Play"
+    },
+    PLAYLIST: {
+        fr: "Liste de lecture",
+        en: "Playlist"
+    },
+    PLAYLIST_CREATED: {
+        fr: "Liste de lecture créée !",
+        en: "Playlist created !"
+    },
+    PLAYLIST_UPDATED: {
+        fr: "Liste de lecture mise à jour !",
+        en: "Playlist updated !"
+    },
+    PLAYLISTS: {
+        fr: "Listes de lecture",
+        en: "Playlists"
     },
     PLEASE_FILL_ALL_THE_FIELDS_CORRECTLY: {
         fr: "Veuillez remplir tous les champs correctement.",
@@ -212,6 +284,10 @@ const Texts = {
     PRESS_RATING: {
         fr: "Note de la presse",
         en: "Press rating"
+    },
+    PREVIOUS_PAGE: {
+        fr: "Page précédente",
+        en: "Previous page"
     },
     PRINCIPAL_COLOR: {
         fr: "Couleur principale",
@@ -242,6 +318,10 @@ const Texts = {
         fr: "Inscription",
         en: "Registration"
     },
+    REMOVE_A_VIDEO_FROM_THIS_PLAYLIST: {
+        fr: "Retirer une vidéo de cette liste de lecture",
+        en: "Remove a video from this playlist"
+    },
     RESET: {
         fr: "Réinitialiser",
         en: "Reset"
@@ -259,6 +339,14 @@ const Texts = {
     /* S */
 
 
+    SAVE: {
+        fr: "Sauvegarder",
+        en: "Save"
+    },
+    SEARCH: {
+        fr: "Rechercher...",
+        en: "Search..."
+    },
     SEARCH_ON_ZONE_TELECHARGEMENT: {
         fr: "Rechercher sur Zone Téléchargement",
         en: "Search on Zone Téléchargement"
@@ -271,6 +359,14 @@ const Texts = {
         fr: "Sélectionner votre langage",
         en: "Select your language"
     },
+    SELECT_A_PLAYLIST_TO_ADD_THIS_VIDEO_TO: {
+        fr: "Sélectionner une liste de lecture à laquelle ajouter cette video",
+        en: "Select a playlist to add this video to"
+    },
+    SEND: {
+        fr: "Envoyer",
+        en: "Send"
+    },
     SERIE: {
         fr: "Série",
         en: "Serie"
@@ -278,6 +374,10 @@ const Texts = {
     SETTINGS: {
         fr: "Paramètres",
         en: "Settings"
+    },
+    SHARE: {
+        fr: "Partager",
+        en: "Share"
     },
     SIGN_IN: {
         fr: "Se connecter",
@@ -330,9 +430,29 @@ const Texts = {
         fr: "Vidéo",
         en: "Video"
     },
+    VIDEOS: {
+        fr: "Vidéos",
+        en: "Videos"
+    },
     VIDEO_ADDED: {
         fr: "Vidéo ajoutée !",
         en: "Video added !"
+    },
+    VIDEO_ADDED_TO_PLAYLIST: {
+        fr: "Vidéo ajoutée à la liste de lecture !",
+        en: "Video added to the playlist!"
+    },
+    VIDEO_LIKED: {
+        fr: "Vous aimez la vidéo !",
+        en: "You liked this video!"
+    },
+    VIDEO_DISLIKED: {
+        fr: "Vous n'aimez plus cette vidéo !",
+        en: "You don't like this video anymore!"
+    },
+    VIDEO_REMOVED_FROM_THE_PLAYLIST: {
+        fr: "Vidéo retirée de la liste de lecture !",
+        en: "Video removed from the playlist!"
     },
 
 
