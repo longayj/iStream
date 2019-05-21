@@ -196,7 +196,20 @@ class AddVideoToPlaylistModal extends React.Component {
 
                 me.props.globalDismissLoadMask();
 
-                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+                console.log(error);
+
+                if (error.response != undefined &&
+                    error.response.data != undefined &&
+                    error.response.data.message != undefined &&
+                    error.response.data.message != null &&
+                    error.response.data.message != "") {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR[me.props.profile.languageString],
+                        text: error.response.data.message
+                    });
+
+                } else if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
 
                     me.props.globalDisplayAlertDialog({
                         title: Texts.NETWORK_ERROR[me.props.profile.languageString],

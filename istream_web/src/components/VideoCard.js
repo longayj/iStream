@@ -186,12 +186,14 @@ class VideoCard extends React.Component {
                     if (me.props.sourceInterface == "myVideos") {
                         me.props.myVideosSetVideoLike({
                             id: me.props.video.id,
-                            liked: true
+                            liked: true,
+                            like_id: response.data.id
                         });
                     } else if (me.props.sourceInterface == "home") {
                         me.props.homeSetVideoLike({
                             id: me.props.video.id,
-                            liked: true
+                            liked: true,
+                            like_id: response.data.id
                         });
                     }
 
@@ -211,7 +213,18 @@ class VideoCard extends React.Component {
 
                 me.props.globalDismissLoadMask();
 
-                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+                if (error.response != undefined &&
+                    error.response.data != undefined &&
+                    error.response.data.message != undefined &&
+                    error.response.data.message != null &&
+                    error.response.data.message != "") {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR[me.props.profile.languageString],
+                        text: error.response.data.message
+                    });
+
+                } else if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
 
                     me.props.globalDisplayAlertDialog({
                         title: Texts.NETWORK_ERROR[me.props.profile.languageString],
@@ -242,7 +255,7 @@ class VideoCard extends React.Component {
         }
 
         this.props.globalDisplayLoadMask();
-        let communication = new CommunicationApi(HttpMethods.DELETE, Paths.HOST + Paths.VIDEOS + "/" + this.props.video.id + Paths.LIKES, params);
+        let communication = new CommunicationApi(HttpMethods.DELETE, Paths.HOST + Paths.VIDEOS + "/" + this.props.video.id + Paths.LIKES + "/" + me.props.video.like_id, params);
         communication.sendRequest(
             function (response) {
 
@@ -278,7 +291,18 @@ class VideoCard extends React.Component {
 
                 me.props.globalDismissLoadMask();
 
-                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+                if (error.response != undefined &&
+                    error.response.data != undefined &&
+                    error.response.data.message != undefined &&
+                    error.response.data.message != null &&
+                    error.response.data.message != "") {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR[me.props.profile.languageString],
+                        text: error.response.data.message
+                    });
+
+                } else if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
 
                     me.props.globalDisplayAlertDialog({
                         title: Texts.NETWORK_ERROR[me.props.profile.languageString],
@@ -430,7 +454,7 @@ VideoCard.defaultProps = {
 VideoCard.propTypes = {
     classes: PropTypes.object.isRequired,
     video: PropTypes.object.isRequired,
-    sourceInterface: PropTypes.object.isRequired
+    sourceInterface: PropTypes.string.isRequired
 };
 
 function mapStateToProps(state) {

@@ -20,7 +20,9 @@ const Fields = {
     PREFERRED_STREAM_QUALITY: "preferredStreamQuality",
     SHARED: "shared",
     PAGE: "page",
-    PER_PAGE: "per_page"
+    PER_PAGE: "per_page",
+    CURRENT_TIME: "currentTime",
+    DURATION: "duration"
 };
 
 export default Fields;

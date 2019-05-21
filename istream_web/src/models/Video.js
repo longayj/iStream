@@ -5,6 +5,7 @@ import Paths from "../constants/Paths";
 
 const defaultState = {
     id: -1,
+    currentUserId: -1,
     title: "",
     originalTitle: "",
     description: "",
@@ -39,6 +40,8 @@ const defaultState = {
     posterUrl: "",
     total_likes: 0,
     liked: false,
+    like_id: -1,
+    likes: [],
     type: VideoTypes.MOVIE,
     currentBestStreamingQuality: "",
     currentBestStreamingLanguage: "",
@@ -95,14 +98,16 @@ class Video {
 
     constructor(state = defaultState,
                 preferredStreamLanguage = Languages.French,
-                preferredStreamQuality = VideoQualities.p360) {
+                preferredStreamQuality = VideoQualities.p360,
+                currentUserId = -1) {
 
-        this.set(state, preferredStreamLanguage, preferredStreamQuality);
+        this.set(state, preferredStreamLanguage, preferredStreamQuality, currentUserId);
     }
 
     set(state = defaultState,
         preferredStreamLanguage = Languages.French,
-        preferredStreamQuality = VideoQualities.p360) {
+        preferredStreamQuality = VideoQualities.p360,
+        currentUserId = -1) {
 
         this.id = (
             (state.id === undefined || state.id === null) ?
@@ -223,12 +228,40 @@ class Video {
                 state.total_likes
         );
 
+        this.likes = (
+            (state.likes === undefined || state.likes === null) ?
+                defaultState.likes
+                :
+                state.likes
+        );
+
+        this.like_id = (
+            (state.like_id === undefined || state.like_id === null) ?
+                defaultState.like_id
+                :
+                state.like_id
+        );
+
         this.liked = (
             (state.liked === undefined || state.liked === null) ?
                 defaultState.liked
                 :
                 state.liked
         );
+
+        this.currentUserId = currentUserId;
+
+        if (this.currentUserId != -1) {
+            let me = this;
+            this.likes.forEach(function (item) {
+                if (item.userId == me.currentUserId &&
+                    (item.value == 1 || item.value == "1" || item.value == true)) {
+
+                    me.liked = true;
+                    me.like_id = item.id;
+                }
+            });
+        }
 
         this.type = (
             (this.saison === defaultState.saison || this.episode === defaultState.episode) ?
@@ -311,8 +344,6 @@ class Video {
 
             if (identity[key] !== undefined &&
                 me.streaming[key] !== "") {
-
-                console.log(delta, preferredStreamLanguage);
 
                 if (delta[preferredStreamLanguage][identity[key].language] < keepBestLanguageDelta) {
                     keepBestLanguage = identity[key].language;

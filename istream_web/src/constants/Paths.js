@@ -21,7 +21,9 @@ const Paths = {
 
     PLAYLISTS: "/playlists",
 
-    LIKES: "/likes"
+    LIKES: "/likes",
+
+    VIEWING: "/viewing"
 
 };
 

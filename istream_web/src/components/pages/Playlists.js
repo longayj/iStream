@@ -176,7 +176,8 @@ class Playlists extends React.Component {
                     response.data.videos.forEach(function (item) {
                         videos.push(new Video(item,
                             me.props.profile.preferredStreamLanguage,
-                            me.props.profile.preferredStreamQuality));
+                            me.props.profile.preferredStreamQuality,
+                            me.props.profile.id));
                     });
 
                     me.setState({
@@ -262,7 +263,18 @@ class Playlists extends React.Component {
 
                 me.props.globalDismissLoadMask();
 
-                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+                if (error.response != undefined &&
+                    error.response.data != undefined &&
+                    error.response.data.message != undefined &&
+                    error.response.data.message != null &&
+                    error.response.data.message != "") {
+
+                    me.props.globalDisplayAlertDialog({
+                        title: Texts.ERROR[me.props.profile.languageString],
+                        text: error.response.data.message
+                    });
+
+                } else if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
 
                     me.props.globalDisplayAlertDialog({
                         title: Texts.NETWORK_ERROR[me.props.profile.languageString],
@@ -327,7 +339,18 @@ class Playlists extends React.Component {
 
                 props.globalDismissLoadMask();
 
-                if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+                if (error.response != undefined &&
+                    error.response.data != undefined &&
+                    error.response.data.message != undefined &&
+                    error.response.data.message != null &&
+                    error.response.data.message != "") {
+
+                    props.globalDisplayAlertDialog({
+                        title: Texts.ERROR[props.profile.languageString],
+                        text: error.response.data.message
+                    });
+
+                } else if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
 
                     props.globalDisplayAlertDialog({
                         title: Texts.NETWORK_ERROR[props.profile.languageString],

@@ -61,7 +61,8 @@ class Video extends React.Component {
         super(props);
         this.state = {
             comment: "",
-            comment_error: false
+            comment_error: false,
+            video_time: 0
         };
     }
 
@@ -215,6 +216,8 @@ class Video extends React.Component {
                         <VideoPlayer
                             poster={me.props.video.posterUrl}
                             src={this.props.video.currentBestStreaming}
+                            videoId={this.props.video.id}
+                            userId={this.props.profile.id}
                             languageString={me.props.profile.languageString}
                             currentLanguage={this.props.video.currentBestStreamingLanguage}
                             onCurrentLanguageChange={this.handleCurrentStreamLanguageChange.bind(this)}

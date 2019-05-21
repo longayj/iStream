@@ -106,7 +106,8 @@ class AddVideoModal extends React.Component {
                     me.props.homeAddVideo(
                         new Video(response.data,
                             me.props.profile.preferredStreamLanguage,
-                            me.props.profile.preferredStreamQuality)
+                            me.props.profile.preferredStreamQuality,
+                            me.props.profile.id)
                     );
 
                     me.props.globalDisplayNotificationSnackbar(Texts.VIDEO_ADDED[me.props.profile.languageString]);

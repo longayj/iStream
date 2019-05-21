@@ -29,8 +29,14 @@ export default (state = initialState, action) => {
             index = videos.findIndex(function (item) {
                 return item.id === action.payload.id;
             });
-            if (index !== -1 && videos[index].liked != action.payload.liked) {
-                videos[index].liked = action.payload.liked;
+            if (index !== -1 && videos[index].liked != action.payload.liked && action.payload.liked == true) {
+                videos[index].liked = true;
+                videos[index].like_id = action.payload.like_id;
+                videos[index].total_likes = videos[index].total_likes + 1;
+            } else if (index !== -1 && videos[index].liked != action.payload.liked && action.payload.liked == false) {
+                videos[index].liked = false;
+                videos[index].like_id = -1;
+                videos[index].total_likes = videos[index].total_likes - 1;
             }
             return {
                 ...state,

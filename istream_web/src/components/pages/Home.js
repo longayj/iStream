@@ -140,7 +140,8 @@ class Home extends React.Component {
                     response.data.videos.forEach(function (item) {
                         videos.push(new Video(item,
                             me.props.profile.preferredStreamLanguage,
-                            me.props.profile.preferredStreamQuality));
+                            me.props.profile.preferredStreamQuality,
+                            me.props.profile.id));
                     });
 
                     me.setState({

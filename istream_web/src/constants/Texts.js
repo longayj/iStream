@@ -454,6 +454,10 @@ const Texts = {
         fr: "Vidéo retirée de la liste de lecture !",
         en: "Video removed from the playlist!"
     },
+    VIEWING: {
+        fr: "Visionnages",
+        en: "viewing"
+    },
 
 
     /* Y */
