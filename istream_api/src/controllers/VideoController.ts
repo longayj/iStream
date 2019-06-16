@@ -494,6 +494,8 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
                     message : "Picture " + video.id + " already like by " + req.params.id
                 })
             }  else {
+                console.log("save new like in else")
+
                 let newLike = new MyLike;
                 newLike.userId = jwttoken.userId;
                 // on met ce qu'on veut c'est genre le type de like
@@ -504,11 +506,13 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
                 return res.send(newLike)
             }
         } else {
+            console.log("save new like")
             let newLike = new MyLike;
             newLike.userId = jwttoken.userId;
             newLike.value = "1";
             newLike.video = video;
             newLike = await connection.manager.save(newLike)
+            console.log("like save")
             delete newLike.video
             return res.send(newLike)
         }
