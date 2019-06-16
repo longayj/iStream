@@ -26,7 +26,7 @@ router.get('/:id', [checkJwt], (req: Request, res: Response) => {
     connection.getRepository(Streaming).findOne({
         where: {id: id}
     }).then(stream => {
-        //console.log(stream)
+        console.log("stream : ", stream)
 
         if (stream[req.query.resolution] != undefined)
             myurl = stream[req.query.resolution];
