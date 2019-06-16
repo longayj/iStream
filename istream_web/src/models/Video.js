@@ -42,6 +42,8 @@ const defaultState = {
     liked: false,
     like_id: -1,
     likes: [],
+    comments: [],
+    total_comments: [],
     type: VideoTypes.MOVIE,
     currentBestStreamingQuality: "",
     currentBestStreamingLanguage: "",
@@ -234,6 +236,15 @@ class Video {
                 :
                 state.likes
         );
+
+        this.comments = (
+            (state.comments === undefined || state.comments === null) ?
+                defaultState.comments
+                :
+                state.comments
+        );
+
+        this.total_comments = this.comments.length;
 
         this.like_id = (
             (state.like_id === undefined || state.like_id === null) ?

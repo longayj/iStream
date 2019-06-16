@@ -24,6 +24,7 @@ import Zone from "./pages/Zone";
 import Playlists from "./pages/Playlists";
 import MyVideos from "./pages/MyVideos";
 import Viewing from "./pages/Viewing";
+import Viewed from "./pages/Viewed";
 
 import Video from "./pages/Video";
 import Settings from "./pages/Settings";
@@ -187,6 +188,13 @@ class App extends React.Component {
                 display: true
             },
             {
+                name: Texts.VIEWED[this.props.profile.languageString],
+                component: Viewed,
+                route: "/viewed",
+                icon: <VideoIcon/>,
+                display: true
+            },
+            {
                 name: Texts.PLAYLISTS[this.props.profile.languageString],
                 component: Playlists,
                 route: "/playlists",
@@ -288,6 +296,7 @@ class App extends React.Component {
                                     <Route path="/zone" component={Zone}/>
                                     <Route path="/myvideos" component={MyVideos} />
                                     <Route path="/viewing" component={Viewing} />
+                                    <Route path="/viewed" component={Viewed} />
                                     <Route path="/playlists" component={Playlists} />
 
                                     <Route path="/video" component={Video} />

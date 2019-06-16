@@ -29,13 +29,19 @@ import {
 
     globalReset,
 
-    globalDisplayCreatePlaylistModal
+    globalDisplayCreatePlaylistModal,
+    globalSetNavigation
 } from "../../redux/actions/globalActions";
 
 import {
     playlistsSetPlaylists,
     playlistsUpdatePlaylist
 } from "../../redux/actions/playlistsActions";
+
+import {
+    videoSetVideo
+} from "../../redux/actions/videoActions";
+
 import Toolbar from "@material-ui/core/es/Toolbar/Toolbar";
 import Button from "@material-ui/core/es/Button/Button";
 import Grid from "@material-ui/core/es/Grid/Grid";
@@ -476,6 +482,78 @@ class Playlists extends React.Component {
 
     handlePlayClick() {
 
+        if (this.state.playlist_videos.length > 0) {
+
+            let params = {};
+
+            let me = this;
+
+            if (!CommunicationApi.checkToken()) {
+                this.props.history.push('/auth');
+                this.props.globalReset();
+            }
+
+            this.props.globalDisplayLoadMask();
+            let communication = new CommunicationApi(HttpMethods.GET, Paths.HOST + Paths.VIDEOS + "/" + me.state.playlist_videos[0].id, params);
+            communication.sendRequest(
+                function (response) {
+
+                    me.props.globalDismissLoadMask();
+
+                    if (response.status === 200) {
+
+                        console.log(response.data);
+
+                        me.props.videoSetVideo({
+                            video: new Video(response.data,
+                                me.props.profile.preferredStreamLanguage,
+                                me.props.profile.preferredStreamQuality,
+                                me.props.profile.id),
+                            originInterfaceRoute: me.props.location.pathname,
+                            is_playlist: true,
+                            videos: me.state.playlist_videos,
+                            playlist_name: me.state.playlist_name,
+                            playlist_index: 0
+                        });
+                        me.props.history.push('/video');
+                        me.props.globalSetNavigation({
+                            selectedRoute: "/video",
+                            keepPrevRouteSettings: me.props.location.pathname,
+                            settingsToggleActive: false
+                        });
+
+                    } else {
+
+                        me.props.globalDisplayAlertDialog({
+                            title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                            text: Status[response.status][me.props.profile.languageString]
+                        });
+
+                    }
+                },
+                function (error) {
+
+                    me.props.globalDismissLoadMask();
+
+                    if (error.response === undefined || error.response.status === undefined || !(error.response.status in Status)) {
+
+                        me.props.globalDisplayAlertDialog({
+                            title: Texts.NETWORK_ERROR[me.props.profile.languageString],
+                            text: Texts.A_NETWORK_ERROR_OCCURED[me.props.profile.languageString]
+                        });
+
+                    } else {
+
+                        me.props.globalDisplayAlertDialog({
+                            title: Texts.ERROR_OCCURED[me.props.profile.languageString],
+                            text: Status[error.response.status][me.props.profile.languageString]
+                        });
+
+                    }
+                },
+                true
+            );
+        }
     }
 
     handleSaveClick() {
@@ -606,14 +684,7 @@ class Playlists extends React.Component {
                                             }
                                         />
 
-                                        <Button
-                                            onClick={this.handleAddVideoClick.bind(this)}
-                                            variant={"contained"}
-                                            color={"secondary"}
-                                        >
-                                            <AddToQueueIcon/>&nbsp;
-                                            {Texts.ADD_A_VIDEO[this.props.profile.languageString]}
-                                        </Button>
+
 
                                         &nbsp;
 
@@ -733,5 +804,8 @@ export default withRouter(connect(mapStateToProps, {
     globalReset,
 
     playlistsSetPlaylists,
-    playlistsUpdatePlaylist
+    playlistsUpdatePlaylist,
+
+    videoSetVideo,
+    globalSetNavigation
 })(Playlists));

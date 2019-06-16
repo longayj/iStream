@@ -1,7 +1,7 @@
 const Paths = {
 
-    //HOST: "http://192.168.0.40:3001",
-    HOST: "http://localhost:3001",
+    //HOST: "http://192.168.1.13:3001",
+    HOST: "https://localhost:3001",
 
     VIDEOS: "/videos",
 
@@ -23,7 +23,10 @@ const Paths = {
 
     LIKES: "/likes",
 
-    VIEWING: "/viewing"
+    VIEWING: "/viewing",
+
+    COMMENT: "/comment",
+    VIEWED: "/viewed"
 
 };
 

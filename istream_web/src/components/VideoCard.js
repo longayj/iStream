@@ -75,7 +75,11 @@ class VideoCard extends React.Component {
     handleOnClick() {
         this.props.videoSetVideo({
             video: this.props.video,
-            originInterfaceRoute: this.props.location.pathname
+            originInterfaceRoute: this.props.location.pathname,
+            is_playlist: false,
+            videos: [],
+            playlist_name: "",
+            playlist_index: 0
         });
         this.props.history.push('/video');
         this.props.globalSetNavigation({
