@@ -22,7 +22,9 @@ const Fields = {
     PAGE: "page",
     PER_PAGE: "per_page",
     CURRENT_TIME: "currentTime",
-    DURATION: "duration"
+    DURATION: "duration",
+    TEXT: "text",
+    VALUE: "value"
 };
 
 export default Fields;

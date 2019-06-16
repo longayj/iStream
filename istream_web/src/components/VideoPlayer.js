@@ -134,7 +134,7 @@ class VideoPlayer extends React.Component {
         if (state.hasStarted && !state.paused) {
 
             if (this.state.interval_id == -1) {
-                let intervalID = window.setInterval(this.sendCurrentTime, 30000, this);
+                let intervalID = window.setInterval(this.sendCurrentTime, 5000, this);
 
                 this.setState({
                     interval_id: intervalID

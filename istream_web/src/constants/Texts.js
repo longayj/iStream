@@ -211,6 +211,10 @@ const Texts = {
         fr: "Page suivante",
         en: "Next page"
     },
+    NEXT_VIDEO: {
+        fr: "Vidéo suivante",
+        en: "Next video"
+    },
     NO_VIDEO_TO_DISPLAY: {
         fr: "Aucune vidéo à afficher ...",
         en: "No video to display..."
@@ -288,6 +292,10 @@ const Texts = {
     PREVIOUS_PAGE: {
         fr: "Page précédente",
         en: "Previous page"
+    },
+    PREVIOUS_VIDEO: {
+        fr: "Vidéo précédente",
+        en: "Previous video"
     },
     PRINCIPAL_COLOR: {
         fr: "Couleur principale",
@@ -456,7 +464,11 @@ const Texts = {
     },
     VIEWING: {
         fr: "Visionnages",
-        en: "viewing"
+        en: "Viewing"
+    },
+    VIEWED: {
+        fr: "Visionnées",
+        en: "Viewed"
     },
 
 
@@ -471,6 +483,11 @@ const Texts = {
     ZONE: {
         fr: "Zone",
         en: "Zone"
+    },
+
+    COMMENT_ADDED: {
+        fr: "Commentaire ajouté !",
+        en: "Comment added !"
     }
 
 };
