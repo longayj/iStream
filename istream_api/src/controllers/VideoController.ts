@@ -497,10 +497,12 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
                 console.log("save new like in else")
 
                 let newLike = new MyLike;
-                newLike.userId = jwttoken.userId;
+                //newLike.userId = jwttoken.userId;
                 // on met ce qu'on veut c'est genre le type de like
                 newLike.value = "1";
                 newLike.video = video;
+                let user = await connection.getRepository(MyUser).findOne(jwttoken.userId)
+                newLike.user = user
                 newLike = await connection.manager.save(newLike)
                 delete newLike.video
                 return res.send(newLike)
@@ -508,7 +510,9 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
         } else {
             console.log("save new like")
             let newLike = new MyLike;
-            newLike.userId = jwttoken.userId;
+            //newLike.userId = jwttoken.userId;
+            let user = await connection.getRepository(MyUser).findOne(jwttoken.userId)
+            newLike.user = user
             newLike.value = "1";
             newLike.video = video;
             newLike = await connection.manager.save(newLike)

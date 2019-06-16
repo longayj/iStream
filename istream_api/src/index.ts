@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import {createConnection} from "typeorm";
+import {createConnection, Tree} from "typeorm";
 import {User} from "./entity/User";
 var fs = require("fs")
 import * as express from 'express'
@@ -99,12 +99,22 @@ createConnection()
     //console.log("Loaded users: ", users);
     
     var app = require('express')();
-    var options = {
-        key: fs.readFileSync('/Users/julienlongayrou/.mkcert/localhost-key.pem'),
-        cert: fs.readFileSync('/Users/julienlongayrou/.mkcert/localhost.pem')
-    };
-    var server = require('https').createServer(options, app);
+    var options;
+    let testBool = false;
+    var server
+    if (testBool) {
 
+        console.log("HTTPS !!!!!!!!!!!!!!")
+        options = {
+            key: fs.readFileSync('/Users/julienlongayrou/.mkcert/localhost-key.pem'),
+            cert: fs.readFileSync('/Users/julienlongayrou/.mkcert/localhost.pem')
+        };
+        server = require('https').createServer(options, app);
+    } else
+    {
+        server = require('http').createServer(app);
+    }
+    
     app.options('*', cors());
 
     //app.use(cookieParser());
