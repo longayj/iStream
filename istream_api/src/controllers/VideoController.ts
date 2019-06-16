@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import {Like as MyLike} from '../entity/Like'
-import {Video, Statistics, CastingShort, Streaming, Like} from '../entity'
+import {Video, Statistics, CastingShort, Streaming, Like, Comment} from '../entity'
+import {User as MyUser} from '../entity/User'
 import { createConnection} from 'typeorm';
 import {Like as like} from 'typeorm'
 import { AlloCineApi, AllDebridApi } from '../Utils';
@@ -45,14 +46,14 @@ router.get('/', (req: Request, res: Response) => {
     }
     connection.getRepository(Video)
     .findAndCount({
-        relations: ["statistics", "streaming", "castingShort", "likes"],
+        relations: ["statistics", "streaming", "castingShort", "likes", "comments"],
         where: mywhere,
         skip: page * per_page,
         take: per_page
     })
     .then(videos => {
         let testvideos: [any[], Number] = videos
-        //console.log(videos)
+        console.log(videos)
         if (videos[0] == undefined || videos[0] == null) {
             res.status(404).send("No videos sorry :(");
             return;
@@ -83,7 +84,7 @@ router.get('/', (req: Request, res: Response) => {
 //  url: 'urlVideo'
 //}
 // route post /videos
-router.post('/', (req: Request, res: Response) => {
+router.post('/', [checkJwt], (req: Request, res: Response) => {
     let bodyUrl = req.body.url;
     let bodyCode = req.body.code;
     console.log("Try to post new video")
@@ -98,7 +99,7 @@ router.post('/', (req: Request, res: Response) => {
         // pour les autre champs, 
         // utiliser une api allociné et alldebrid et save ensuite 
         console.log(" Allocine")
-        AlloCineApi.searchMovie(bodyCode, (err, result) => {
+        AlloCineApi.searchMovie(bodyCode, async (err, result) => {
             if (err || result.movie == undefined) {
                 console.log('Error : '+ err);
                 res.status(400).send("Bad movie code");
@@ -127,6 +128,9 @@ router.post('/', (req: Request, res: Response) => {
                 newVideo.releaseDate = new Date(movie.release.releaseDate);
             newVideo.actors = movie.castingShort.actors
             newVideo.directors = movie.castingShort.directors
+            let user = await connection.getRepository(MyUser).findOne(res.locals.jwtPayload.userId)
+            //newVideo.userId = res.locals.jwtPayload.userId
+            newVideo.user = user
             // si casting short create !!
             if (movie.castingShort != undefined) {
                 let castingShort = new CastingShort
@@ -178,7 +182,7 @@ router.post('/', (req: Request, res: Response) => {
                                 console.log(receivedStreaming)
 
                                 StreamingLinkToStreaming(receivedStreaming, streaming);
-
+                                NewStreamingLingToStreamin(result.data.infos.streams, streaming);
                                 //newVideo.streaming = streaming;
                                 //streaming.video = newVideo;
                                 connection.manager.save(streaming)
@@ -236,6 +240,7 @@ router.post('/', (req: Request, res: Response) => {
                             
                             let streaming = new Streaming
                             StreamingLinkToStreaming(result.data.infos.streaming, streaming);
+                            NewStreamingLingToStreamin(result.data.infos.streams, streaming);
                             //
                             //streaming.video = newVideo;
                             connection.manager.save(streaming).then(streaming => {
@@ -283,6 +288,7 @@ router.post('/', (req: Request, res: Response) => {
                         
                         let streaming = new Streaming
                         StreamingLinkToStreaming(result.data.infos.streaming, streaming);
+                        NewStreamingLingToStreamin(result.data.infos.streams, streaming);
                         //newVideo.streaming = streaming;
                         //streaming.video = newVideo;
                         connection.manager.save(streaming).then(streaming => {
@@ -330,7 +336,7 @@ router.get('/:id', (req: Request, res: Response) => {
     let id = req.params.id;
 
     connection.getRepository(Video)
-    .findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort", "likes"]})
+    .findOne({where: {id: id}, relations: ["statistics", "streaming", "castingShort", "likes", "comments"]})
     .then(video => {
         console.log(video)
         if (video == undefined || video == null) {
@@ -413,6 +419,51 @@ router.get('/:id', (req: Request, res: Response) => {
     })
 
 });
+
+router.get("/:id/comment", (req: Request, res: Response) => {
+
+})
+
+router.post("/:id/comment", [checkJwt], (req: Request, res: Response) => {
+    let jwttoken = res.locals.jwtPayload
+    console.log("User ", jwttoken.userId, " try to post comment to video id ", req.params.id)
+    if (isNaN(Number.parseInt(req.params.id))) {
+        return res.status(400).send({
+            message: "Bad request"
+        })
+    }
+    let value = req.body.value
+    console.log("Value : ", value, " body ", req.body)
+    if (value == undefined)
+        return res.status(400).send('Bad Request')
+    let idVideo = req.params.id
+    let userId = jwttoken.userId
+
+    let newComment = new Comment
+    connection.getRepository(MyUser).findOne({
+        where: {
+            id : jwttoken.userId
+        }
+    }).then(user => {
+        console.log(user)
+        let username = user.username
+        console.log("username ", username)
+        newComment.value = value
+        newComment.userId = userId;
+        newComment.videoId = idVideo
+        newComment.username = username
+        console.log("Comment to add ", newComment)
+        connection.manager.save(newComment).then(comment => {
+            return res.send(comment)
+        }).catch( err => {
+            console.log(err)
+            return res.status(500).send('Fail to add Comment');
+        })
+    }).catch(err => {
+        console.log(err)
+        return res.status(500).send({message: "Fail to get user"})
+    })
+})
 
 router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
     let jwttoken = res.locals.jwtPayload
@@ -576,6 +627,18 @@ router.delete('/:id', [checkJwt, checkRole(["ADMIN"])], (req: Request, res: Resp
 
 export const VideoController: Router = router;
 
+function NewStreamingLingToStreamin(receivedStreaming:any, streaming:Streaming) {
+    receivedStreaming.forEach(stream => {
+        if (stream.quality == 360)
+            streaming.fr360p = stream.link
+        if (stream.quality == 480)
+            streaming.fr480p = stream.link
+        if (stream.quality == 720)
+            streaming.fr720p = stream.link
+        if (stream.quality == 1080)
+            streaming.fr1080p = stream.link
+    })
+}
 
 function StreamingLinkToStreaming(receivedStreaming:any, streaming:Streaming) {
     if (receivedStreaming["360p unknown 0"] != undefined) {

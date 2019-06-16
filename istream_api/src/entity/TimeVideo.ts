@@ -9,7 +9,7 @@ export class TimeVideo {
     id: number;
 
     @Column({nullable: true})
-    ended:boolean;
+    ended:number = 0;
     
     @Column({nullable: true})
     duration: number

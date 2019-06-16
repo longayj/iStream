@@ -13,7 +13,7 @@ export class AllDebridApi {
 
     static getToken(username: string = private_config.alldebrid.defaultUser, password: string = private_config.alldebrid.defaultPassword) {
         console.log("try to get token with username : " + username + " and password : " + password)
-        return Axios.get("https://api.alldebrid.com/user/login?agent=iStream&username=" + username + "&password=" + password)
+        return Axios.get("https://api.alldebrid.com/user/login?agent=iStream&token=c23c9c06f729801be164627d744bb6ce22gg5")
     }
 
     static getSupportedHost() {

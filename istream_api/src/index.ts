@@ -49,7 +49,7 @@ createConnection()
     await connection.manager.save(user2);
 
     console.log("Saved a new user with id: " + user.id);
-
+/*
     let playlist = new Playlist();
     playlist.id = 1;
     playlist.name = "First Playlist"
@@ -81,18 +81,18 @@ createConnection()
     video.filename = "Filename of the BestMovie 2"
     video.productionYear = 1903
     await connection.manager.save(video)
-    
-    // AllDebridApi.getToken()
-    // .then(result => {
-    //     if (result.data.success == false)
-    //         return
-    //     AllDebridApi.setDefaultToken(result.data.token);
-    //     return true;
-    // }).catch(res => {
-    //     console.log(res.response.statusText)
-    //     console.log("you can't add new movie, verify your file ./configs/private.json")
-    //     return false;
-    // })
+    */
+    AllDebridApi.getToken()
+    .then(result => {
+        if (result.data.success == false)
+            return
+        AllDebridApi.setDefaultToken(result.data.token);
+        return true;
+    }).catch(res => {
+        console.log(res.response.statusText)
+        console.log("you can't add new movie, verify your file ./configs/private.json")
+        return false;
+    })
 
     //console.log("Loading users from the database...");
     //const users = await connection.manager.find(User);
