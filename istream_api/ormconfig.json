@@ -3,8 +3,9 @@
    "database": "database.sqlite",
    "synchronize": true,
    "migrationsRun": false,
-   "logging": false,
-   "entities": [
+   "logging": true,
+    "logger": "advanced-console",
+    "entities": [
       "src/entity/**/*.ts"
    ],
    "migrations": [

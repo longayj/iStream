@@ -17,6 +17,6 @@ export class Like {
     @ManyToOne(type => Video, video => video.user)
     user: User;
 
-    @Column()
+    @Column({nullable: true})
     userId: number
 }

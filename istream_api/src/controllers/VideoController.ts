@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import {Like as MyLike} from '../entity/Like'
-import {Video, Statistics, CastingShort, Streaming, Like, Comment} from '../entity'
+import {Video, Statistics, CastingShort, Streaming, Comment} from '../entity'
 import {User as MyUser} from '../entity/User'
 import { createConnection} from 'typeorm';
 import {Like as like} from 'typeorm'
@@ -475,7 +475,7 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
     }
     
     connection.getRepository(Video)
-    .findOne({where: {id: req.params.id}, relations: ["statistics", "streaming", "castingShort", "likes"]})
+    .findOne({where: {id: req.params.id}, relations: ["statistics", "streaming", "castingShort", "likes", "comments"]})
     .then(async video => {
         console.log(video)
         if (video == undefined || video == null)
@@ -510,7 +510,7 @@ router.post('/:id/likes', [checkJwt], (req: Request, res: Response) => {
         } else {
             console.log("save new like")
             let newLike = new MyLike;
-            //newLike.userId = jwttoken.userId;
+            newLike.userId = jwttoken.userId;
             let user = await connection.getRepository(MyUser).findOne(jwttoken.userId)
             newLike.user = user
             newLike.value = "1";
