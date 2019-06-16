@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {createConnection} from "typeorm";
 import {User} from "./entity/User";
-
+var fs = require("fs")
 import * as express from 'express'
 import * as path from 'path'
 import * as bodyParser from 'body-parser';
@@ -99,7 +99,11 @@ createConnection()
     //console.log("Loaded users: ", users);
     
     var app = require('express')();
-    var server = require('http').createServer(app);
+    var options = {
+        key: fs.readFileSync('/Users/julienlongayrou/.mkcert/localhost-key.pem'),
+        cert: fs.readFileSync('/Users/julienlongayrou/.mkcert/localhost.pem')
+    };
+    var server = require('https').createServer(options, app);
 
     app.options('*', cors());
 
